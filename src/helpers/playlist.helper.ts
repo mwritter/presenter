@@ -99,6 +99,38 @@ export const editPlaylistSlideData = async (
   }
 };
 
+export const editAllPlaylistSlideData = async (
+  content: Partial<SlideEntryType>,
+  playlist: PlaylistType
+) => {
+  for (const section of playlist.content) {
+    const slides = section.slides.map((slide) => ({ ...slide, ...content }));
+    section.slides = slides;
+  }
+  await write(playlist.name, playlist);
+};
+
+export const editAllPlaylistSectionSlidesData = async (
+  content: Partial<SlideEntryType>,
+  playlistSection: PlaylistEntryType
+) => {
+  const slides = playlistSection.slides.map((slide) => ({
+    ...slide,
+    ...content,
+  }));
+  const playlist = useStore.getState().playlist;
+  if (playlist) {
+    const updatedContent = playlist?.content.map((section) => {
+      if (section.id === playlistSection.id) {
+        section.slides = slides;
+      }
+      return section;
+    });
+    playlist.content = updatedContent;
+    await write(playlist.name, playlist);
+  }
+};
+
 export const renamePlaylist = async (name: string, playlist: PlaylistType) => {
   const newName = `${name}.json`;
   await renameFile(`playlists/${playlist.name}`, `playlists/${newName}`, {

@@ -26,6 +26,7 @@ export type SlideEntryType = {
   id: string;
   text: string;
   group: GroupType;
+  theme: string;
 };
 
 export type BibleType = {

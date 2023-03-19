@@ -5,12 +5,13 @@
 }
 
 html,
-body {
+body,
+.App {
   overflow: hidden;
   background-color: #282c34;
 }
 
-.App {
+#Presenter {
   display: grid;
   grid-template-areas: "library show";
   grid-template-columns: auto 1fr;

@@ -11,8 +11,12 @@
     "version": "0.0.0"
   },
   "tauri": {
+    "macOSPrivateApi": true,
     "allowlist": {
       "all": false,
+      "window": {
+        "all": true
+      },
       "shell": {
         "all": false,
         "open": true
@@ -23,6 +27,10 @@
       "fs": {
         "all": true,
         "scope": ["$APPDATA/**"]
+      },
+      "protocol": {
+        "asset": true,
+        "assetScope": ["$APPDATA/media/*"]
       }
     },
     "bundle": {

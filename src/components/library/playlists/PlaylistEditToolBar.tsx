@@ -2,12 +2,15 @@ import styled from "@emotion/styled";
 import { ActionIcon, List, TextInput, Title } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { renamePlaylist } from "../../../helpers/playlist.helper";
+import {
+  editAllPlaylistSlideData,
+  renamePlaylist,
+} from "../../../helpers/playlist.helper";
 import useStore from "../../../store";
 import PlaylistAddLibraryMenu from "./PlaylistAddLibraryMenu";
+import PlaylistChangeThemeMenu from "./PlaylistThemeMenu";
 
 const PlaylistEditToolBarContainer = styled.div`
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -38,7 +41,10 @@ const PlaylistActionsList = styled(List)`
 
 const PlaylistEditToolBar = () => {
   const [editPlaylist, setEditPlaylist] = useState(false);
-  const [playlist] = useStore(({ playlist }) => [playlist]);
+  const { playlist, projector } = useStore(({ playlist, projector }) => ({
+    playlist,
+    projector,
+  }));
   const [playlistName, setPlaylistName] = useState("");
 
   useEffect(() => {
@@ -86,6 +92,15 @@ const PlaylistEditToolBar = () => {
         </List.Item>
         <List.Item>
           <PlaylistAddLibraryMenu />
+        </List.Item>
+        <List.Item>
+          <PlaylistChangeThemeMenu
+            onHandleThemeChange={(content) =>
+              editAllPlaylistSlideData(content, playlist).then(() => {
+                projector?.emit("set-theme", content.theme);
+              })
+            }
+          />
         </List.Item>
       </PlaylistActionsList>
     </PlaylistEditToolBarContainer>

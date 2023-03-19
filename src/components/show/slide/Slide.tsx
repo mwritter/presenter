@@ -5,6 +5,7 @@ import SlideGroupIndicatorMenu from "./SlideGroupIndicatorMenu";
 import useStore from "../../../store";
 import { editPlaylistSlideData } from "../../../helpers/playlist.helper";
 import { Text } from "@mantine/core";
+import { SlideEntryType } from "../../../types/LibraryTypes";
 
 interface SliderContainerProps {
   active?: boolean;
@@ -16,38 +17,35 @@ const SlideContainer = styled.div<SliderContainerProps>`
   padding: 1rem;
   cursor: pointer;
   background-color: #07090e7f;
+  place-content: center;
 `;
 
 const SlideBody = styled.div`
-  display: grid;
-  place-content: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
   height: 150px;
+  width: 100%;
   color: white;
 `;
 
 const SlideGroupIndicator = styled.div<SlideGroupIndicatorProps>`
-  bottom: 10%;
+  bottom: 0%;
   height: 10px;
-  width: 100%;
   background-color: ${(p) => p.groupId || "gray"};
-  border-radius: 10px;
+  border-radius: 5px;
+  justify-self: center;
 `;
 
-const Slide = ({
-  sectionId,
-  slideId,
-  text,
-  active,
-  group,
-  onClick,
-}: SlideProps) => {
+const Slide = ({ slide, sectionId, active, onClick }: SlideProps) => {
   const [openedGroupMenu, setOpenedGroupMenu] = useState(false);
   const playlist = useStore(({ playlist }) => playlist);
   return (
-    <SlideContainer active={active}>
+    <SlideContainer style={{ backgroundSize: "cover" }} active={active}>
       <SlideBody onClick={onClick}>
-        {text.split("\n").map((t) => (
+        {slide.text.split("\n").map((t) => (
           <Text>{t}</Text>
         ))}
       </SlideBody>
@@ -57,7 +55,7 @@ const Slide = ({
         onItemClick={(groupId) => {
           if (playlist) {
             editPlaylistSlideData(
-              slideId,
+              slide.id,
               sectionId,
               { group: groupId },
               playlist
@@ -65,18 +63,16 @@ const Slide = ({
           }
         }}
       >
-        <SlideGroupIndicator groupId={Groups[group]} />
+        <SlideGroupIndicator groupId={Groups[slide.group]} />
       </SlideGroupIndicatorMenu>
     </SlideContainer>
   );
 };
 
 interface SlideProps {
+  slide: SlideEntryType;
   sectionId: string;
-  slideId: string;
-  text: string;
   active: boolean;
-  group: GroupType;
   onClick: () => void;
 }
 
