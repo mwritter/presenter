@@ -26,6 +26,7 @@ export const getLibraryFileData = async (
   const parsedContent = JSON.parse(content);
   parsedContent.path = path;
   parsedContent.id = uuid();
+  parsedContent.theme = "fancy";
   return parsedContent;
 };
 

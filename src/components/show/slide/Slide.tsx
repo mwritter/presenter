@@ -39,12 +39,16 @@ const SlideGroupIndicator = styled.div<SlideGroupIndicatorProps>`
   justify-self: center;
 `;
 
-const Slide = ({ slide, sectionId, active, onClick }: SlideProps) => {
+const Slide = ({ slide, sectionId, theme, active, onClick }: SlideProps) => {
   const [openedGroupMenu, setOpenedGroupMenu] = useState(false);
   const playlist = useStore(({ playlist }) => playlist);
   return (
-    <SlideContainer style={{ backgroundSize: "cover" }} active={active}>
-      <SlideBody onClick={onClick}>
+    <SlideContainer
+      style={{ backgroundSize: "cover" }}
+      className={`theme-projector-${theme}`}
+      active={active}
+    >
+      <SlideBody className={`theme-slide-${theme}`} onClick={onClick}>
         {slide.text.split("\n").map((t) => (
           <Text>{t}</Text>
         ))}
@@ -72,6 +76,7 @@ const Slide = ({ slide, sectionId, active, onClick }: SlideProps) => {
 interface SlideProps {
   slide: SlideEntryType;
   sectionId: string;
+  theme: string;
   active: boolean;
   onClick: () => void;
 }

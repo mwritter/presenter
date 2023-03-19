@@ -1,19 +1,20 @@
 import styled from "@emotion/styled";
 import { Text } from "@mantine/core";
 import { listen } from "@tauri-apps/api/event";
-import { readTextFile } from "@tauri-apps/api/fs";
-import { convertFileSrc } from "@tauri-apps/api/tauri";
-import { createRef, useEffect, useRef, useState } from "react";
+import { createRef, useEffect, useState } from "react";
 import ProjectorStyle from "../components/projector/ProjectorStyle";
 import { SlideEntryType } from "../types/LibraryTypes";
 import { appWindow } from "@tauri-apps/api/window";
 
 const listenForSlideChanges = async (
-  callBack: (slide: SlideEntryType) => void
+  callBack: (slide: SlideEntryType & { theme: string }) => void
 ) => {
-  await listen<SlideEntryType>("set-slide", ({ payload }) => {
-    callBack(payload);
-  });
+  await listen<SlideEntryType & { theme: string }>(
+    "set-slide",
+    ({ payload }) => {
+      callBack(payload);
+    }
+  );
 };
 
 const listenForThemeChanges = async (callBack: (theme: string) => void) => {
@@ -31,20 +32,12 @@ const ProjectorContainer = styled.main`
 const SlideContainer = styled.div`
   width: 100%;
   height: 100%;
-  /* position: absolute;
-  font-size: 4vw;
-  text-align: center;
-  text-transform: uppercase;
-  white-space: nowrap;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); */
 `;
 
 const Projector = () => {
   const slideRef = createRef<HTMLDivElement>();
   const containerRef = createRef<HTMLElement>();
-  const [slide, setSlide] = useState<SlideEntryType>();
+  const [slide, setSlide] = useState<SlideEntryType & { theme: string }>();
   const [theme, setTheme] = useState<string | null>();
 
   useEffect(() => {

@@ -1,9 +1,10 @@
 import styled from "@emotion/styled";
 import { ActionIcon, Title } from "@mantine/core";
-import { IconPaint, IconTrash } from "@tabler/icons-react";
+import { IconEdit, IconPaint, IconTrash } from "@tabler/icons-react";
 import React from "react";
 import {
   editAllPlaylistSectionSlidesData,
+  editPlaylistSection,
   removeContent,
 } from "../../../helpers/playlist.helper";
 import useStore from "../../../store";
@@ -33,9 +34,9 @@ const PlaylistSectionToolBar = ({
     <SectionTitleContainer>
       <SectionTitle>{section.name?.split(".")[0]}</SectionTitle>
       <PlaylistChangeThemeMenu
-        onHandleThemeChange={(content) =>
-          editAllPlaylistSectionSlidesData(content, section).then(() => {
-            projector?.emit("set-theme", content.theme);
+        onHandleThemeChange={(theme) =>
+          editPlaylistSection({ theme }, section).then(() => {
+            projector?.emit("set-theme", theme);
           })
         }
       />
@@ -45,6 +46,13 @@ const PlaylistSectionToolBar = ({
         }}
       >
         <IconTrash size={12} />
+      </ActionIcon>
+      <ActionIcon
+        onClick={() => {
+          // TODO: move all actions into a Modal
+        }}
+      >
+        <IconEdit size={12} />
       </ActionIcon>
     </SectionTitleContainer>
   );

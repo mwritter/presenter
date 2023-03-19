@@ -61,14 +61,19 @@ const ShowView = () => {
                   <Slide
                     key={idx}
                     sectionId={section.id}
+                    theme={section.theme}
                     active={activeSlideId === section.id + idx}
                     slide={slide}
                     onClick={() => {
                       setActiveSlideId(section.id + idx);
-                      console.log("here");
-                      projector?.emit("set-slide", slide).then(() => {
-                        console.log("setting");
-                      });
+                      projector
+                        ?.emit("set-slide", {
+                          ...slide,
+                          theme: section.theme,
+                        })
+                        .then(() => {
+                          console.log("setting");
+                        });
                     }}
                   />
                 );

@@ -60,7 +60,7 @@ function PlaylistChangeThemeMenu({
               key={themeName}
               onClick={() => {
                 if (playlist && themeName) {
-                  onHandleThemeChange({ theme: themeName });
+                  onHandleThemeChange(themeName);
                   setOpened(false);
                 }
               }}
@@ -75,7 +75,7 @@ function PlaylistChangeThemeMenu({
 }
 
 interface PlaylistThemeMenuProps {
-  onHandleThemeChange: (content: Partial<SlideEntryType>) => Promise<void>;
+  onHandleThemeChange: (theme: string) => Promise<void>;
 }
 
 type ThemeEntryProps = TextProps & {

@@ -93,15 +93,6 @@ const PlaylistEditToolBar = () => {
         <List.Item>
           <PlaylistAddLibraryMenu />
         </List.Item>
-        <List.Item>
-          <PlaylistChangeThemeMenu
-            onHandleThemeChange={(content) =>
-              editAllPlaylistSlideData(content, playlist).then(() => {
-                projector?.emit("set-theme", content.theme);
-              })
-            }
-          />
-        </List.Item>
       </PlaylistActionsList>
     </PlaylistEditToolBarContainer>
   ) : null;
