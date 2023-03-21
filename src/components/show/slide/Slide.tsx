@@ -1,12 +1,11 @@
-import { createRef, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "@emotion/styled";
-import { Groups, GroupType } from "../helpers/slide.helper";
+import { Groups } from "../helpers/slide.helper";
 import SlideGroupIndicatorMenu from "./SlideGroupIndicatorMenu";
 import useStore from "../../../store";
 import { editPlaylistSlideData } from "../../../helpers/playlist.helper";
 import { Text } from "@mantine/core";
 import { SlideEntryType } from "../../../types/LibraryTypes";
-import { WebviewWindow } from "@tauri-apps/api/window";
 
 interface SliderContainerProps {
   active?: boolean;
@@ -49,25 +48,21 @@ const Slide = ({ slide, sectionId, theme, active, onClick }: SlideProps) => {
     (projectorWidth: number, projectorHeight: number) => {
       if (!slideRef.current) return;
       const { clientWidth: width, clientHeight: height } = slideRef.current;
-      let value = 0,
+      let scale = 0,
         left = 0,
         top = 0;
       // Fill height
       if ((projectorHeight / projectorWidth) * width > height) {
-        value = height / projectorHeight;
-        left = (width - value * projectorWidth) / 2;
+        scale = height / projectorHeight;
+        left = (width - scale * projectorWidth) / 2;
       }
       // Else, fill width
       else {
-        value = width / projectorWidth;
-        top = (height - value * projectorHeight) / 2;
+        scale = width / projectorWidth;
+        top = (height - scale * projectorHeight) / 2;
       }
-      console.log("left", left);
-      console.log("top", top);
-      setScale(() => {
-        console.log("scale is", scale);
-        return value;
-      });
+
+      setScale(scale);
       setLeft(left);
       setTop(top);
     },
@@ -75,20 +70,15 @@ const Slide = ({ slide, sectionId, theme, active, onClick }: SlideProps) => {
   );
 
   useEffect(() => {
-    if (slideRef.current) {
-      projector?.innerSize().then(({ width, height }) => {
-        console.log(width, height);
-        measure(width, height);
-      });
-    }
+    projector?.innerSize().then(({ width, height }) => {
+      measure(width, height);
+    });
   }, []);
 
   return (
     <SlideContainer className={`theme-projector-${theme}`} active={active}>
       <SlideBody
         style={{
-          height: "150px",
-          width: "350px",
           transform: `translate(${left}px, ${top}px) scale(${scale})`,
         }}
         ref={slideRef}
