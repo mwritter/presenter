@@ -3,7 +3,6 @@ import { WebviewWindow, availableMonitors } from "@tauri-apps/api/window";
 import ShowView from "./ShowView";
 import useStore from "../store";
 import { useEffect } from "react";
-import PresenterStyle from "../components/presenter/PresenterStyle";
 
 const setProjectorMonitor = async () => {
   const monitors = await availableMonitors();
@@ -13,6 +12,7 @@ const setProjectorMonitor = async () => {
   }
   const projectorWindow = new WebviewWindow("projector", {
     url: "/projector",
+    fullscreen: true,
   });
 
   projectorWindow.once("tauri://created", () => {
@@ -27,13 +27,10 @@ const Presenter = () => {
   }, []);
 
   return (
-    <>
-      <PresenterStyle />
-      <div id="Presenter">
-        <LibraryView />
-        <ShowView />
-      </div>
-    </>
+    <div id="Presenter">
+      <LibraryView />
+      <ShowView />
+    </div>
   );
 };
 

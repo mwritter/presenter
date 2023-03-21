@@ -26,7 +26,8 @@
       },
       "fs": {
         "all": true,
-        "scope": ["$APPDATA/**"]
+        "scope": ["$APPDATA/**"],
+        "exists": true
       },
       "protocol": {
         "asset": true,

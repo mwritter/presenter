@@ -34,6 +34,10 @@ const SlideContainer = styled.div`
   height: 100%;
 `;
 
+const SlideBody = styled.div`
+  height: 100%;
+`;
+
 const Projector = () => {
   const slideRef = createRef<HTMLDivElement>();
   const containerRef = createRef<HTMLElement>();
@@ -59,15 +63,14 @@ const Projector = () => {
 
   return (
     <>
-      <ProjectorStyle />
       {slide ? (
         <ProjectorContainer ref={containerRef} id="Projector">
           <SlideContainer className={`theme-projector-${theme}`}>
-            <div className={`theme-slide-${theme}`} ref={slideRef}>
+            <SlideBody className={`theme-slide-${theme}`} ref={slideRef}>
               {slide.text.split("\n").map((t, idx) => (
                 <Text key={idx}>{t}</Text>
               ))}
-            </div>
+            </SlideBody>
           </SlideContainer>
         </ProjectorContainer>
       ) : (

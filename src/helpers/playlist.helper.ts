@@ -1,11 +1,12 @@
 import {
   BaseDirectory,
+  createDir,
+  exists,
   readDir,
   readTextFile,
   renameFile,
   writeTextFile,
 } from "@tauri-apps/api/fs";
-import { v4 as uuid } from "uuid";
 import useStore from "../store";
 import {
   PlaylistEntryType,
@@ -15,6 +16,10 @@ import {
 import { getLibraryFileData } from "./library.helper";
 
 export const getPlaylistsDirContents = async () => {
+  const hasPlaylist = await exists("playlists", { dir: BaseDirectory.AppData });
+  if (!hasPlaylist) {
+    await createDir("playlists", { dir: BaseDirectory.AppData });
+  }
   const contents = await readDir("playlists", { dir: BaseDirectory.AppData });
   useStore
     .getState()

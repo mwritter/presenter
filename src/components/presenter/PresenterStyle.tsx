@@ -1,10 +1,10 @@
-import { readTextFile } from "@tauri-apps/api/fs";
+import { BaseDirectory, readTextFile } from "@tauri-apps/api/fs";
 import { useEffect, useState } from "react";
+import { getThemeEnties } from "../../helpers/theme.helper";
 
 const getThemes = async () => {
-  return await readTextFile(
-    `/Users/matthewritter/Library/Application Support/com.presenter-lite/themes/index.css`
-  );
+  await getThemeEnties();
+  return await readTextFile(`themes/index.css`, { dir: BaseDirectory.AppData });
 };
 
 const PresenterStyle = () => {

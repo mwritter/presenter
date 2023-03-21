@@ -4,11 +4,15 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import "./styles.css";
+import PresenterStyle from "./components/presenter/PresenterStyle";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <BrowserRouter>
-    <MantineProvider withGlobalStyles withNormalizeCSS>
-      <App />
-    </MantineProvider>
-  </BrowserRouter>
+  <>
+    <PresenterStyle />
+    <BrowserRouter>
+      <MantineProvider withGlobalStyles withNormalizeCSS>
+        <App />
+      </MantineProvider>
+    </BrowserRouter>
+  </>
 );

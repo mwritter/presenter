@@ -1,10 +1,8 @@
-import { readTextFile } from "@tauri-apps/api/fs";
+import { BaseDirectory, readTextFile } from "@tauri-apps/api/fs";
 import { useEffect, useState } from "react";
 
 const getThemes = async () => {
-  return await readTextFile(
-    `/Users/matthewritter/Library/Application Support/com.presenter-lite/themes/index.css`
-  );
+  return await readTextFile(`themes/index.css`, { dir: BaseDirectory.AppData });
 };
 
 const ProjectorStyle = () => {
