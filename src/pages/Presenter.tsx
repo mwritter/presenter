@@ -12,7 +12,8 @@ const setProjectorMonitor = async () => {
   }
   const projectorWindow = new WebviewWindow("projector", {
     url: "/projector",
-    fullscreen: true,
+    title: "projector",
+    // fullscreen: true,
   });
 
   projectorWindow.once("tauri://created", () => {

@@ -6,6 +6,7 @@ import useStore from "../../../store";
 import { editPlaylistSlideData } from "../../../helpers/playlist.helper";
 import { Text } from "@mantine/core";
 import { SlideEntryType } from "../../../types/LibraryTypes";
+import { TauriEvent } from "@tauri-apps/api/event";
 
 interface SliderContainerProps {
   active?: boolean;
@@ -17,12 +18,9 @@ const SlideContainer = styled.div<SliderContainerProps>`
   padding: 1rem;
   cursor: pointer;
   background-color: #07090e7f;
-  place-content: center;
 `;
 
-const SlideBody = styled.div`
-  height: 150px;
-`;
+const SlideBody = styled.div``;
 
 const SlideGroupIndicator = styled.div<SlideGroupIndicatorProps>`
   bottom: 0%;
@@ -35,53 +33,53 @@ const SlideGroupIndicator = styled.div<SlideGroupIndicatorProps>`
 const Slide = ({ slide, sectionId, theme, active, onClick }: SlideProps) => {
   const slideRef = useRef<HTMLDivElement>(null);
   const [openedGroupMenu, setOpenedGroupMenu] = useState(false);
+  const [height, setHeight] = useState(0);
   const [scale, setScale] = useState(0);
-  const [left, setLeft] = useState(0);
-  const [top, setTop] = useState(0);
 
   const { playlist, projector } = useStore(({ playlist, projector }) => ({
     playlist,
     projector,
   }));
 
-  const measure = useCallback(
+  const scaleSlide = useCallback(
     (projectorWidth: number, projectorHeight: number) => {
       if (!slideRef.current) return;
       const { clientWidth: width, clientHeight: height } = slideRef.current;
-      let scale = 0,
-        left = 0,
-        top = 0;
-      // Fill height
-      if ((projectorHeight / projectorWidth) * width > height) {
-        scale = height / projectorHeight;
-        left = (width - scale * projectorWidth) / 2;
-      }
-      // Else, fill width
-      else {
-        scale = width / projectorWidth;
-        top = (height - scale * projectorHeight) / 2;
-      }
-
-      setScale(scale);
-      setLeft(left);
-      setTop(top);
+      const quotient = projectorHeight / projectorWidth;
+      const newHeight = quotient * width;
+      setHeight(newHeight);
+      setScale((width / projectorWidth) * 2.2);
     },
     []
   );
 
   useEffect(() => {
-    projector?.innerSize().then(({ width, height }) => {
-      measure(width, height);
+    projector?.outerSize().then(({ width, height }) => {
+      scaleSlide(width, height);
+    });
+    // For debugging
+    projector?.listen(TauriEvent.WINDOW_RESIZED, () => {
+      projector?.outerSize().then(({ width, height }) => {
+        console.log(width, height);
+        scaleSlide(width, height);
+      });
     });
   }, []);
 
   return (
-    <SlideContainer className={`theme-projector-${theme}`} active={active}>
+    <SlideContainer
+      style={{
+        overflow: "hidden",
+      }}
+      className={`theme-projector-${theme}`}
+      active={active}
+    >
       <SlideBody
-        style={{
-          transform: `translate(${left}px, ${top}px) scale(${scale})`,
-        }}
         ref={slideRef}
+        style={{
+          height,
+          transform: `scale(${scale})`,
+        }}
         className={`theme-slide-${theme}`}
         onClick={onClick}
       >
