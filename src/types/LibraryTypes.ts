@@ -15,7 +15,7 @@ export type PlaylistEntryType = {
 
 export type LibraryEntryType = {
   name: string;
-  slides: SlideEntryType[];
+  slides: LibrarySlideEntryType[];
 };
 
 export type SlideType = {
@@ -25,6 +25,11 @@ export type SlideType = {
 
 export type SlideEntryType = {
   id: string;
+  text: string;
+  group: GroupType;
+};
+
+export type LibrarySlideEntryType = {
   text: string;
   group: GroupType;
 };

@@ -11,26 +11,28 @@ export const createThemeDir = async () => {
     dir: BaseDirectory.AppData,
     recursive: true,
   });
-  await writeTextFile("themes/index.json", JSON.stringify(["demo"]), {
+  await writeTextFile("themes/index.json", JSON.stringify(["default"]), {
     dir: BaseDirectory.AppData,
   });
   await writeTextFile(
     "themes/index.css",
     `
-    /* ====== demo ======  */
-    .theme-projector-demo {
+    /* ====== default ======  */
+    .theme-projector-default {
       display: flex;
       flex-direction: column;
-      background: linear-gradient(#e66465, #9198e5);
+      background: black;
     }
-    .theme-slide-demo {
+    .theme-slide-default {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       color: white;
       font-size: 80px;
+      white-space: nowrap;
     }
-    /* ====== demo ======  */
+    /* ====== default ======  */
   `,
     { dir: BaseDirectory.AppData }
   );
