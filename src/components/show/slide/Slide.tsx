@@ -33,7 +33,7 @@ const SlideGroupIndicator = styled.div<SlideGroupIndicatorProps>`
 const Slide = ({ slide, sectionId, theme, active, onClick }: SlideProps) => {
   const slideRef = useRef<HTMLDivElement>(null);
   const [openedGroupMenu, setOpenedGroupMenu] = useState(false);
-  const [height, setHeight] = useState(0);
+  const [height, setHeight] = useState(150);
   const [scale, setScale] = useState(0);
 
   const { playlist, projector } = useStore(({ playlist, projector }) => ({
@@ -67,43 +67,47 @@ const Slide = ({ slide, sectionId, theme, active, onClick }: SlideProps) => {
   }, []);
 
   return (
-    <SlideContainer
-      style={{
-        overflow: "hidden",
-      }}
-      className={`theme-projector-${theme}`}
-      active={active}
-    >
-      <SlideBody
-        ref={slideRef}
-        style={{
-          height,
-          transform: `scale(${scale})`,
-        }}
-        className={`theme-slide-${theme}`}
-        onClick={onClick}
-      >
-        {slide.text.split("\n").map((t, idx) => (
-          <Text key={idx}>{t}</Text>
-        ))}
-      </SlideBody>
-      <SlideGroupIndicatorMenu
-        opened={openedGroupMenu}
-        onChange={setOpenedGroupMenu}
-        onItemClick={(groupId) => {
-          if (playlist) {
-            editPlaylistSlideData(
-              slide.id,
-              sectionId,
-              { group: groupId },
-              playlist
-            );
-          }
-        }}
-      >
-        <SlideGroupIndicator groupId={Groups[slide.group]} />
-      </SlideGroupIndicatorMenu>
-    </SlideContainer>
+    <>
+      {projector && (
+        <SlideContainer
+          style={{
+            overflow: "hidden",
+          }}
+          className={`theme-projector-${theme}`}
+          active={active}
+        >
+          <SlideBody
+            ref={slideRef}
+            style={{
+              height,
+              transform: `scale(${scale})`,
+            }}
+            className={`theme-slide-${theme}`}
+            onClick={onClick}
+          >
+            {slide.text.split("\n").map((t, idx) => (
+              <Text key={idx}>{t}</Text>
+            ))}
+          </SlideBody>
+          <SlideGroupIndicatorMenu
+            opened={openedGroupMenu}
+            onChange={setOpenedGroupMenu}
+            onItemClick={(groupId) => {
+              if (playlist) {
+                editPlaylistSlideData(
+                  slide.id,
+                  sectionId,
+                  { group: groupId },
+                  playlist
+                );
+              }
+            }}
+          >
+            <SlideGroupIndicator groupId={Groups[slide.group]} />
+          </SlideGroupIndicatorMenu>
+        </SlideContainer>
+      )}
+    </>
   );
 };
 

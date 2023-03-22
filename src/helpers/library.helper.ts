@@ -34,7 +34,6 @@ export const createLibraryDir = async () => {
     name: "Demo",
     slides: [
       {
-        id: uuid(),
         text: "This is a demo",
         group: "NONE",
       },
@@ -57,7 +56,7 @@ export const getLibraryFileData = async (
   const parsedContent = JSON.parse(content);
   parsedContent.path = path;
   parsedContent.id = uuid();
-  parsedContent.theme = "demo";
+  parsedContent.theme = "default";
   return parsedContent;
 };
 
@@ -66,5 +65,18 @@ export const create = async (name: string) => {
     dir: BaseDirectory.AppData,
     recursive: true,
   });
+  await getLibraryDirContents();
+};
+
+export const addLibraryFile = async (content: LibraryEntryType) => {
+  const fileExists = await exists(`library/Default/${content.name}`, {
+    dir: BaseDirectory.AppData,
+  });
+  if (fileExists) return;
+  await writeTextFile(
+    `library/Default/${content.name}`,
+    JSON.stringify(content),
+    { dir: BaseDirectory.AppData }
+  );
   await getLibraryDirContents();
 };
