@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "@emotion/styled";
-import { Groups } from "../helpers/slide.helper";
+import { Groups, GroupType } from "../helpers/slide.helper";
 import SlideGroupIndicatorMenu from "./SlideGroupIndicatorMenu";
 import useStore from "../../../store";
 import { editPlaylistSlideData } from "../../../helpers/playlist.helper";
 import { Text } from "@mantine/core";
-import { SlideEntryType } from "../../../types/LibraryTypes";
+import {
+  LibrarySlideEntryType,
+  SlideEntryType,
+} from "../../../types/LibraryTypes";
 import { TauriEvent } from "@tauri-apps/api/event";
 
 interface SliderContainerProps {
@@ -30,11 +33,17 @@ const SlideGroupIndicator = styled.div<SlideGroupIndicatorProps>`
   justify-self: center;
 `;
 
-const Slide = ({ slide, sectionId, theme, active, onClick }: SlideProps) => {
+const Slide = ({
+  slide,
+  theme,
+  active,
+  onClick,
+  onGroupChange,
+}: SlideProps) => {
   const slideRef = useRef<HTMLDivElement>(null);
   const [openedGroupMenu, setOpenedGroupMenu] = useState(false);
   const [height, setHeight] = useState(150);
-  const [scale, setScale] = useState(0);
+  const [scale, setScale] = useState(0.1);
 
   const { playlist, projector } = useStore(({ playlist, projector }) => ({
     playlist,
@@ -44,7 +53,7 @@ const Slide = ({ slide, sectionId, theme, active, onClick }: SlideProps) => {
   const scaleSlide = useCallback(
     (projectorWidth: number, projectorHeight: number) => {
       if (!slideRef.current) return;
-      const { clientWidth: width, clientHeight: height } = slideRef.current;
+      const { clientWidth: width } = slideRef.current;
       const quotient = projectorHeight / projectorWidth;
       const newHeight = quotient * width;
       setHeight(newHeight);
@@ -68,55 +77,45 @@ const Slide = ({ slide, sectionId, theme, active, onClick }: SlideProps) => {
 
   return (
     <>
-      {projector && (
-        <SlideContainer
+      <SlideContainer
+        style={{
+          overflow: "hidden",
+        }}
+        className={`theme-projector-${theme}`}
+        active={active}
+        onClick={onClick}
+      >
+        <SlideBody
+          ref={slideRef}
           style={{
-            overflow: "hidden",
+            height,
+            transform: `scale(${scale})`,
           }}
-          className={`theme-projector-${theme}`}
-          active={active}
+          className={`theme-slide-${theme}`}
         >
-          <SlideBody
-            ref={slideRef}
-            style={{
-              height,
-              transform: `scale(${scale})`,
-            }}
-            className={`theme-slide-${theme}`}
-            onClick={onClick}
-          >
-            {slide.text.split("\n").map((t, idx) => (
-              <Text key={idx}>{t}</Text>
-            ))}
-          </SlideBody>
-          <SlideGroupIndicatorMenu
-            opened={openedGroupMenu}
-            onChange={setOpenedGroupMenu}
-            onItemClick={(groupId) => {
-              if (playlist) {
-                editPlaylistSlideData(
-                  slide.id,
-                  sectionId,
-                  { group: groupId },
-                  playlist
-                );
-              }
-            }}
-          >
-            <SlideGroupIndicator groupId={Groups[slide.group]} />
-          </SlideGroupIndicatorMenu>
-        </SlideContainer>
-      )}
+          {slide.text.split("\n").map((t, idx) => (
+            <Text key={idx}>{t}</Text>
+          ))}
+        </SlideBody>
+        <SlideGroupIndicatorMenu
+          opened={openedGroupMenu}
+          onChange={setOpenedGroupMenu}
+          // TODO: this needs to be dynamic to allow editing library files as well
+          onGroupChange={onGroupChange}
+        >
+          <SlideGroupIndicator groupId={Groups[slide.group]} />
+        </SlideGroupIndicatorMenu>
+      </SlideContainer>
     </>
   );
 };
 
 interface SlideProps {
-  slide: SlideEntryType;
-  sectionId: string;
+  slide: SlideEntryType | LibrarySlideEntryType;
   theme: string;
   active: boolean;
   onClick: () => void;
+  onGroupChange: (group: GroupType) => void;
 }
 
 interface SlideGroupIndicatorProps {

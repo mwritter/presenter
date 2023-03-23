@@ -1,5 +1,9 @@
 import styled from "@emotion/styled";
+import useStore from "../../store";
+import { PresenterMode } from "../../types/LibraryTypes";
+import LibraryDirView from "./libraries/LibraryDirView";
 import LibraryFileInput from "./libraries/LibraryFileInput";
+import LibraryViewNav from "./LibraryViewNav";
 import PlaylistDirView from "./playlists/PlaylistDirView";
 
 const LibraryViewContainer = styled.div`
@@ -25,10 +29,13 @@ const LibraryViewContainer = styled.div`
 `;
 
 const LibraryView = () => {
+  const mode = useStore(({ mode }) => mode);
   return (
     <LibraryViewContainer>
-      <PlaylistDirView />
-      <LibraryFileInput />
+      {mode === PresenterMode.PLAYLIST && <PlaylistDirView />}
+      {mode === PresenterMode.LIBRARY && <LibraryDirView />}
+      {/* {mode === PresenterMode.MEDIA && <div>Not implemented yet</div>} */}
+      <LibraryViewNav />
     </LibraryViewContainer>
   );
 };

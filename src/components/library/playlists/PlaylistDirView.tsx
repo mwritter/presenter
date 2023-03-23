@@ -35,28 +35,6 @@ const PlaylistDirTitle = styled(Title)`
   padding: 0.5rem;
 `;
 
-const PlaylistItemNavLink = styled(NavLink)<NavLinkProps>`
-  position: relative;
-  color: white;
-
-  &:hover {
-    background-color: #476480;
-  }
-  .mantine-NavLink-body {
-    position: relative;
-    padding: 0 0.2rem;
-  }
-  .mantine-NavLink-label {
-    width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .mantine-NavLink-label,
-  svg {
-    color: white;
-  }
-`;
-
 const PlaylistDirView = () => {
   const [items, setItems] = useState<PlaylistEntryType[]>([]);
   const [playlists, playlist, setPlaylist] = useStore(

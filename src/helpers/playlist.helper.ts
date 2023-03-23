@@ -13,7 +13,7 @@ import {
   PlaylistType,
   SlideEntryType,
 } from "../types/LibraryTypes";
-import { getLibraryFileData } from "./library.helper";
+import { getLibraryFileDataForPlaylist } from "./library.helper";
 
 export const getPlaylistsDirContents = async () => {
   const hasPlaylist = await exists("playlists", { dir: BaseDirectory.AppData });
@@ -169,7 +169,7 @@ export const create = async (name: string) => {
 
 export const addContent = async (name: string, libraryName: string) => {
   const playlist = await parsePlaylist(name);
-  const content = await getLibraryFileData(libraryName);
+  const content = await getLibraryFileDataForPlaylist(libraryName);
   playlist.content = [...playlist.content, content];
   await write(name, playlist);
 };

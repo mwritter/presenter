@@ -15,6 +15,7 @@ export type PlaylistEntryType = {
 
 export type LibraryEntryType = {
   name: string;
+  path: string;
   slides: LibrarySlideEntryType[];
 };
 
@@ -30,6 +31,7 @@ export type SlideEntryType = {
 };
 
 export type LibrarySlideEntryType = {
+  id: string;
   text: string;
   group: GroupType;
 };
@@ -47,3 +49,11 @@ export type BibleChapterType = {
 export type BibleVerseType = {
   text: string;
 };
+
+export type ModeType = PresenterMode;
+
+export enum PresenterMode {
+  PLAYLIST,
+  LIBRARY,
+  MEDIA,
+}

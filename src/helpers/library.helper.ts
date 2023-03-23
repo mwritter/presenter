@@ -8,7 +8,11 @@ import {
 } from "@tauri-apps/api/fs";
 import { v4 as uuid } from "uuid";
 import useStore from "../store";
-import { LibraryEntryType, PlaylistEntryType } from "../types/LibraryTypes";
+import {
+  LibraryEntryType,
+  LibrarySlideEntryType,
+  PlaylistEntryType,
+} from "../types/LibraryTypes";
 
 export const getLibraryDirContents = async () => {
   const hasLibrary = await exists("library", {
@@ -32,8 +36,10 @@ export const createLibraryDir = async () => {
   // Create a Demo slide
   const DemoLibrary: LibraryEntryType = {
     name: "Demo",
+    path: "library/Default/Demo.json",
     slides: [
       {
+        id: uuid(),
         text: "This is a demo",
         group: "NONE",
       },
@@ -46,7 +52,7 @@ export const createLibraryDir = async () => {
   );
 };
 
-export const getLibraryFileData = async (
+export const getLibraryFileDataForPlaylist = async (
   name: string
 ): Promise<PlaylistEntryType> => {
   const path = `library/Default/${name}`;
@@ -60,6 +66,18 @@ export const getLibraryFileData = async (
   return parsedContent;
 };
 
+export const getLibraryFileData = async (
+  name: string
+): Promise<LibraryEntryType> => {
+  const path = `library/Default/${name}`;
+  const content = await readTextFile(path, {
+    dir: BaseDirectory.AppData,
+  });
+  const parsedContent = JSON.parse(content);
+  parsedContent.path = path;
+  return parsedContent;
+};
+
 export const create = async (name: string) => {
   await createDir(`library/${name}`, {
     dir: BaseDirectory.AppData,
@@ -69,14 +87,38 @@ export const create = async (name: string) => {
 };
 
 export const addLibraryFile = async (content: LibraryEntryType) => {
-  const fileExists = await exists(`library/Default/${content.name}`, {
+  const fileExists = await exists(content.path, {
     dir: BaseDirectory.AppData,
   });
   if (fileExists) return;
-  await writeTextFile(
-    `library/Default/${content.name}`,
-    JSON.stringify(content),
-    { dir: BaseDirectory.AppData }
-  );
+  await writeTextFile(content.path, JSON.stringify(content), {
+    dir: BaseDirectory.AppData,
+  });
+  await getLibraryDirContents();
+};
+
+export const editLibrarySlideData = async (
+  content: Partial<LibrarySlideEntryType>,
+  slideId: string
+) => {
+  const library = useStore.getState().library;
+  if (library) {
+    const slides = library.slides.map((slide) => {
+      if (slide.id === slideId) {
+        return { ...slide, ...content };
+      }
+      return slide;
+    });
+    library.slides = slides;
+    await write(library);
+  }
+};
+
+export const write = async (library: LibraryEntryType) => {
+  const content = JSON.stringify(library);
+  await writeTextFile(`library/Default/${library.name}`, content, {
+    dir: BaseDirectory.AppData,
+  });
+  useStore.getState().setLibrary(library);
   await getLibraryDirContents();
 };

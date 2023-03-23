@@ -1,7 +1,5 @@
-import styled from "@emotion/styled";
-import { ActionIcon, FileButton, FileInput } from "@mantine/core";
-import { IconFileUpload } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { ActionIcon, FileButton } from "@mantine/core";
+import { IconPlus } from "@tabler/icons-react";
 import { v4 as uuid } from "uuid";
 import { addLibraryFile } from "../../../helpers/library.helper";
 import { GroupType } from "../../show/helpers/slide.helper";
@@ -22,44 +20,22 @@ const handleFilesUpload = (evt: ProgressEvent<FileReader>, file: File) => {
     text,
     group: "NONE" as GroupType,
   }));
+  const fileName = `${file.name.split(".").at(0)}.json`;
   // we're also only reading the first file for now
   addLibraryFile({
-    name: file.name,
+    name: fileName,
+    path: `library/Default/${fileName}`,
     slides: slides,
   });
 };
 
 const LibraryFileInput = () => {
-  const [files, setFiles] = useState<File[] | null>(null);
-
-  useEffect(() => {
-    if (files) {
-      const reader = new FileReader();
-      reader.addEventListener("load", (evt) => {
-        const uploadText = reader.result as string;
-        // creates slides based on two returns
-        // would be better to split two or more returns
-        const slides = uploadText.split("\n\n").map((text) => ({
-          id: uuid(),
-          text,
-          group: "NONE" as GroupType,
-        }));
-        // we're also only reading the first file for now
-        addLibraryFile({
-          name: files[0].name,
-          slides: slides,
-        });
-      });
-      reader.readAsText(files[0]);
-    }
-  }, [files]);
-
   return (
     <>
-      <FileButton multiple onChange={setFiles}>
+      <FileButton multiple onChange={handleFilesOnChange}>
         {(props) => (
-          <ActionIcon {...props}>
-            <IconFileUpload size={14} />
+          <ActionIcon variant="transparent" {...props}>
+            <IconPlus size={16} />
           </ActionIcon>
         )}
       </FileButton>

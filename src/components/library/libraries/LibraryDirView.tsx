@@ -1,21 +1,39 @@
 import styled from "@emotion/styled";
-import { Text, TextProps } from "@mantine/core";
+import { Text, TextProps, Title } from "@mantine/core";
 import useStore from "../../../store";
-import { addContent } from "../../../helpers/playlist.helper";
-import { useEffect } from "react";
-import { getLibraryDirContents } from "../../../helpers/library.helper";
+import { useEffect, useState } from "react";
+import {
+  getLibraryDirContents,
+  getLibraryFileData,
+} from "../../../helpers/library.helper";
+import LibraryFileInput from "./LibraryFileInput";
 
 const LibraryDirContainer = styled.section``;
 
 const LibraryEntry = styled(Text)<LibraryEntryProps>`
   color: white;
-  background-color: ${(p) => (p.index % 2 === 0 ? "#454747" : "")};
   cursor: pointer;
   padding: 0.2rem 1rem;
-
+  background-color: ${(p) => (p.selected ? "#476480" : "")};
   &:hover {
     background-color: #476480;
   }
+`;
+
+const LibraryHeaderContainer = styled.div`
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  justify-self: flex-start;
+  background-color: #21212a;
+  z-index: 1;
+`;
+
+const LibraryDirTitle = styled(Title)`
+  align-self: flex-start;
+  padding: 0.5rem;
 `;
 
 const ScrollableList = styled.div`
@@ -30,10 +48,15 @@ const ScrollableList = styled.div`
 `;
 
 const LibraryDirView = () => {
-  const [libraries, playlist] = useStore(({ libraries, playlist }) => [
-    libraries,
-    playlist,
-  ]);
+  const [libraries, library, playlist, setLibrary] = useStore(
+    ({ libraries, library, playlist, setLibrary }) => [
+      libraries,
+      library,
+      playlist,
+      setLibrary,
+    ]
+  );
+  const [selected, setSelected] = useState<string>(library?.path || "");
 
   useEffect(() => {
     getLibraryDirContents();
@@ -41,6 +64,10 @@ const LibraryDirView = () => {
 
   return (
     <LibraryDirContainer>
+      <LibraryHeaderContainer>
+        <LibraryDirTitle order={6}>LIBRARY</LibraryDirTitle>
+        <LibraryFileInput />
+      </LibraryHeaderContainer>
       <ScrollableList>
         {libraries.map((f) => {
           return f.children ? (
@@ -49,14 +76,13 @@ const LibraryDirView = () => {
                 .filter((l) => l.name && !/^\./.test(l.name))
                 .map((c, idx) => (
                   <LibraryEntry
-                    index={idx}
+                    selected={selected === c.path}
                     key={c.path}
                     onClick={() => {
-                      if (playlist && c.name) {
-                        if (playlist.name && c.name) {
-                          addContent(playlist.name, c.name);
-                        }
+                      if (c.name) {
+                        getLibraryFileData(c.name).then(setLibrary);
                       }
+                      setSelected(c.path);
                     }}
                   >
                     {c.name?.split(".")[0]}
@@ -71,7 +97,7 @@ const LibraryDirView = () => {
 };
 
 type LibraryEntryProps = TextProps & {
-  index: number;
+  selected: boolean;
   onClick: () => void;
 };
 

@@ -1,24 +1,30 @@
 import { FileEntry } from "@tauri-apps/api/fs";
 import { WebviewWindow } from "@tauri-apps/api/window";
 import { create } from "zustand";
-import { PlaylistType } from "../types/LibraryTypes";
+import {
+  LibraryEntryType,
+  PlaylistType,
+  PresenterMode,
+} from "../types/LibraryTypes";
 
 interface AppState {
   playlist: PlaylistType | null;
-  library: FileEntry | null;
+  library: LibraryEntryType | null;
   show: PlaylistType | null;
   projector: WebviewWindow | null;
   playlists: FileEntry[];
   libraries: FileEntry[];
+  mode: PresenterMode;
 }
 
 interface Action {
   setPlaylists: (files: FileEntry[]) => void;
   setPlaylist: (playlist: PlaylistType) => void;
   setLibraries: (libraries: FileEntry[]) => void;
-  setLibrary: (library: FileEntry) => void;
+  setLibrary: (library: LibraryEntryType) => void;
   setShow: (show: PlaylistType) => void;
   setProjector: (projector: WebviewWindow) => void;
+  setMode: (mode: PresenterMode) => void;
 }
 
 const useStore = create<AppState & Action>((set) => ({
@@ -28,6 +34,7 @@ const useStore = create<AppState & Action>((set) => ({
   library: null,
   show: null,
   projector: null,
+  mode: PresenterMode.PLAYLIST,
   setPlaylists: (playlists) => {
     set(() => ({ playlists }));
   },
@@ -38,6 +45,13 @@ const useStore = create<AppState & Action>((set) => ({
   setLibrary: (library) => set(() => ({ library })),
   setShow: (show) => set(() => ({ show })),
   setProjector: (projector) => set(() => ({ projector })),
+  setMode: (mode) =>
+    set((state) => {
+      if (mode === PresenterMode.PLAYLIST && state.library) {
+        return { mode, library: null };
+      }
+      return { mode };
+    }),
 }));
 
 export default useStore;

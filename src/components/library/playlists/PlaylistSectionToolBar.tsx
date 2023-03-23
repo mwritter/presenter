@@ -3,7 +3,6 @@ import { ActionIcon, Title } from "@mantine/core";
 import { IconEdit, IconPaint, IconTrash } from "@tabler/icons-react";
 import React from "react";
 import {
-  editAllPlaylistSectionSlidesData,
   editPlaylistSection,
   removeContent,
 } from "../../../helpers/playlist.helper";
@@ -19,6 +18,7 @@ const SectionTitleContainer = styled.div`
   padding: 5px;
   border-radius: 5px;
   align-items: center;
+  z-index: 1;
 `;
 
 const SectionTitle = styled(Title)`
