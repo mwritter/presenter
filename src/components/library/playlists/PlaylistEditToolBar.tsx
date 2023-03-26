@@ -17,7 +17,7 @@ const PlaylistEditToolBarContainer = styled.div`
   gap: 1rem;
   position: sticky;
   top: 0px;
-  z-index: 1;
+  z-index: 2;
   background-color: #21212a;
   padding: 4px;
   padding-left: 1rem;

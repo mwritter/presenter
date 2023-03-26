@@ -19,22 +19,61 @@
       },
       "shell": {
         "all": false,
-        "open": true
+        "open": true,
+        "sidecar": true,
+        "scope": [
+          {
+            "name": "binaries/ffmpeg",
+            "sidecar": true,
+            "args": [
+              "-i",
+              {
+                "validator": "\\S+"
+              },
+              "-vf",
+              "scale=480:-1",
+              "-frames:v",
+              "1",
+              {
+                "validator": "\\S+"
+              }
+            ]
+          },
+          {
+            "name": "binaries/ffmpeg",
+            "sidecar": true,
+            "args": [
+              "-i",
+              {
+                "validator": "\\S+"
+              },
+              "-vf",
+              "scale=480:-1",
+              {
+                "validator": "\\S+"
+              }
+            ]
+          }
+        ]
       },
       "path": {
         "all": true
       },
       "fs": {
         "all": true,
-        "scope": ["$APPDATA/**"],
+        "scope": ["**"],
         "exists": true
+      },
+      "dialog": {
+        "all": true
       },
       "protocol": {
         "asset": true,
-        "assetScope": ["$APPDATA/media/*"]
+        "assetScope": ["$APPDATA/media/**"]
       }
     },
     "bundle": {
+      "externalBin": ["binaries/ffmpeg"],
       "active": true,
       "icon": [
         "icons/32x32.png",

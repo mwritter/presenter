@@ -10,7 +10,23 @@ export type PlaylistEntryType = {
   theme: string;
   name?: string;
   path?: string;
-  slides: SlideEntryType[];
+  slides: SlideEntryType[] | PlaylistMediaEntryType[];
+};
+
+export type PlaylistMediaEntryType = MediaEntryType & {
+  id: string;
+};
+
+export type MediaType = {
+  name: string;
+  path: string;
+  items: MediaEntryType[];
+};
+
+export type MediaEntryType = {
+  name: string;
+  thumbnail: string;
+  source: string;
 };
 
 export type LibraryEntryType = {

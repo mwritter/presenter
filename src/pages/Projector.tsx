@@ -53,7 +53,6 @@ const Projector = () => {
   }, []);
 
   useEffect(() => {
-    console.log(theme);
     if (slide && slide.theme && slide.theme !== theme) {
       appWindow.emit("set-theme", slide.theme);
     } else if (slide && !slide.theme) {

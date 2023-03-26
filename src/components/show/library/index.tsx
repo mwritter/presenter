@@ -16,26 +16,23 @@ const ShowViewGrid = styled.div`
 
 const LibraryShowView = () => {
   const library = useStore(({ library }) => library);
-  console.log(library?.slides);
   return (
-    <>
-      <Stack p={20} spacing={50}>
-        <ShowViewGrid>
-          {library?.slides.map((slide, idx) => (
-            <Slide
-              key={idx}
-              theme={"default"}
-              active={false}
-              slide={slide}
-              onClick={() => {}}
-              onGroupChange={(group) => {
-                editLibrarySlideData({ group }, slide.id);
-              }}
-            />
-          ))}
-        </ShowViewGrid>
-      </Stack>
-    </>
+    <Stack p={20} spacing={50}>
+      <ShowViewGrid>
+        {library?.slides.map((slide, idx) => (
+          <Slide
+            key={idx}
+            theme={"default"}
+            active={false}
+            slide={slide}
+            onClick={() => {}}
+            onGroupChange={(group) => {
+              editLibrarySlideData({ group }, slide.id);
+            }}
+          />
+        ))}
+      </ShowViewGrid>
+    </Stack>
   );
 };
 

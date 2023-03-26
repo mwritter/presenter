@@ -5,6 +5,7 @@ import useStore from "../store";
 import { PresenterMode } from "../types/LibraryTypes";
 import PlaylistShowView from "../components/show/playlist";
 import LibraryShowView from "../components/show/library";
+import MediaShowView from "../components/show/media";
 
 const ShowViewContainer = styled.section`
   position: relative;
@@ -33,11 +34,14 @@ const ShowView = () => {
 
   return (
     <ShowViewContainer>
-      <Box hidden={mode !== PresenterMode.PLAYLIST && Boolean(library)}>
+      <Box hidden={mode !== PresenterMode.PLAYLIST}>
         <PlaylistShowView />
       </Box>
-      <Box hidden={mode !== PresenterMode.LIBRARY && !Boolean(library)}>
+      <Box hidden={mode !== PresenterMode.LIBRARY}>
         <LibraryShowView />
+      </Box>
+      <Box hidden={mode !== PresenterMode.MEDIA}>
+        <MediaShowView />
       </Box>
     </ShowViewContainer>
   );

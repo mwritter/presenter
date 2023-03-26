@@ -4,6 +4,7 @@ import { PresenterMode } from "../../types/LibraryTypes";
 import LibraryDirView from "./libraries/LibraryDirView";
 import LibraryFileInput from "./libraries/LibraryFileInput";
 import LibraryViewNav from "./LibraryViewNav";
+import MediaDirView from "./media/MediaDirView";
 import PlaylistDirView from "./playlists/PlaylistDirView";
 
 const LibraryViewContainer = styled.div`
@@ -34,7 +35,7 @@ const LibraryView = () => {
     <LibraryViewContainer>
       {mode === PresenterMode.PLAYLIST && <PlaylistDirView />}
       {mode === PresenterMode.LIBRARY && <LibraryDirView />}
-      {/* {mode === PresenterMode.MEDIA && <div>Not implemented yet</div>} */}
+      {mode === PresenterMode.MEDIA && <MediaDirView />}
       <LibraryViewNav />
     </LibraryViewContainer>
   );

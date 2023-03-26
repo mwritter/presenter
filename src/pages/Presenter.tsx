@@ -22,6 +22,8 @@ const setProjectorMonitor = async () => {
   });
 };
 
+// TODO: when main view is closed or reloaded we need to close / reload
+// the projector as well
 const Presenter = () => {
   useEffect(() => {
     setProjectorMonitor();

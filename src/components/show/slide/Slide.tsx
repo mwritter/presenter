@@ -69,7 +69,6 @@ const Slide = ({
     // For debugging
     projector?.listen(TauriEvent.WINDOW_RESIZED, () => {
       projector?.outerSize().then(({ width, height }) => {
-        console.log(width, height);
         scaleSlide(width, height);
       });
     });

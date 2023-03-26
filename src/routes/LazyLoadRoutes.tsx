@@ -10,7 +10,7 @@ export function lazyLoadRoutes(componentName: string) {
 
   // Wrapping around the suspense component is mandatory
   return (
-    <Suspense fallback="Loading...">
+    <Suspense fallback="">
       <LazyElement />
     </Suspense>
   );
