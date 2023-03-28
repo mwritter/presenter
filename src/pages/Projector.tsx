@@ -3,7 +3,7 @@ import { Text } from "@mantine/core";
 import { listen } from "@tauri-apps/api/event";
 import { createRef, useEffect, useState } from "react";
 import ProjectorStyle from "../components/projector/ProjectorStyle";
-import { SlideEntryType } from "../types/LibraryTypes";
+import { MediaEntryType, SlideEntryType } from "../types/LibraryTypes";
 import { appWindow } from "@tauri-apps/api/window";
 
 const listenForSlideChanges = async (
@@ -12,6 +12,7 @@ const listenForSlideChanges = async (
   await listen<SlideEntryType & { theme: string }>(
     "set-slide",
     ({ payload }) => {
+      console.log({ payload });
       callBack(payload);
     }
   );
@@ -43,6 +44,10 @@ const Projector = () => {
   const containerRef = createRef<HTMLElement>();
   const [slide, setSlide] = useState<SlideEntryType & { theme: string }>();
   const [theme, setTheme] = useState<string | null>();
+  const [media, setMedia] = useState<Record<string, string | null>>({
+    img: null,
+    video: null,
+  });
 
   useEffect(() => {
     // TODO: unlisten to these events on
@@ -58,6 +63,26 @@ const Projector = () => {
     } else if (slide && !slide.theme) {
       setTheme(null);
     }
+    if (slide?.media) {
+      const ext =
+        slide?.media.source.split("%2F").pop()?.split(".").pop() || "";
+      if (["mp4", "mov"].includes(ext)) {
+        setMedia({
+          video: slide.media.source,
+          img: null,
+        });
+      } else if (["png", "jpg", "jpeg"].includes(ext)) {
+        setMedia({
+          video: null,
+          img: slide.media.source,
+        });
+      }
+    } else {
+      setMedia({
+        video: null,
+        img: null,
+      });
+    }
   }, [slide]);
 
   return (
@@ -66,9 +91,13 @@ const Projector = () => {
         <ProjectorContainer ref={containerRef} id="Projector">
           <SlideContainer className={`theme-projector-${theme}`}>
             <SlideBody className={`theme-slide-${theme}`} ref={slideRef}>
-              {slide.text.split("\n").map((t, idx) => (
+              {slide.text?.split("\n").map((t, idx) => (
                 <Text key={idx}>{t}</Text>
               ))}
+              {media.img && <img src={media.img} height="100%" />}
+              {media.video && (
+                <video autoPlay src={media.video} height="100%" />
+              )}
             </SlideBody>
           </SlideContainer>
         </ProjectorContainer>

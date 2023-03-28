@@ -149,7 +149,10 @@ export const createMediaFileThumbnail = async (sourceFilePath: string) => {
       "1",
       thumbnailFilePath,
     ]);
-    await command.execute();
+    const output = await command.execute();
+    if (output.code != 0) {
+      console.log(output.stderr);
+    }
   } else if (["png", "jpg", "jpeg"]) {
     console.log("ffmpeg - image");
     const command = Command.sidecar("binaries/ffmpeg", [
@@ -159,7 +162,10 @@ export const createMediaFileThumbnail = async (sourceFilePath: string) => {
       "scale=480:-1",
       thumbnailFilePath,
     ]);
-    await command.execute();
+    const output = await command.execute();
+    if (output.code != 0) {
+      console.log(output.stderr);
+    }
   }
   return thumbnailFilePath;
 };

@@ -7,10 +7,10 @@ export type PlaylistType = {
 
 export type PlaylistEntryType = {
   id: string;
-  theme: string;
+  theme?: string;
   name?: string;
   path?: string;
-  slides: SlideEntryType[] | PlaylistMediaEntryType[];
+  slides: SlideEntryType[];
 };
 
 export type PlaylistMediaEntryType = MediaEntryType & {
@@ -42,8 +42,9 @@ export type SlideType = {
 
 export type SlideEntryType = {
   id: string;
-  text: string;
-  group: GroupType;
+  text?: string;
+  group?: GroupType;
+  media?: MediaEntryType;
 };
 
 export type LibrarySlideEntryType = {

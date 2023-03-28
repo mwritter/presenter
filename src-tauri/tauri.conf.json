@@ -25,34 +25,7 @@
           {
             "name": "binaries/ffmpeg",
             "sidecar": true,
-            "args": [
-              "-i",
-              {
-                "validator": "\\S+"
-              },
-              "-vf",
-              "scale=480:-1",
-              "-frames:v",
-              "1",
-              {
-                "validator": "\\S+"
-              }
-            ]
-          },
-          {
-            "name": "binaries/ffmpeg",
-            "sidecar": true,
-            "args": [
-              "-i",
-              {
-                "validator": "\\S+"
-              },
-              "-vf",
-              "scale=480:-1",
-              {
-                "validator": "\\S+"
-              }
-            ]
+            "args": true
           }
         ]
       },

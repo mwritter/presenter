@@ -5,11 +5,10 @@ import SlideGroupIndicatorMenu from "./SlideGroupIndicatorMenu";
 import useStore from "../../../store";
 import { editPlaylistSlideData } from "../../../helpers/playlist.helper";
 import { Text } from "@mantine/core";
-import {
-  LibrarySlideEntryType,
-  SlideEntryType,
-} from "../../../types/LibraryTypes";
+import { SlideEntryType } from "../../../types/LibraryTypes";
 import { TauriEvent } from "@tauri-apps/api/event";
+import MediaSlide from "./MediaSlide";
+import TextSlide from "./TextSlide";
 
 interface SliderContainerProps {
   active?: boolean;
@@ -18,15 +17,11 @@ interface SliderContainerProps {
 const SlideContainer = styled.div<SliderContainerProps>`
   border: 3px solid ${(p) => (p.active ? "#9DC08B" : "#ccc")};
   border-radius: 5px;
-  padding: 1rem;
   cursor: pointer;
   background-color: #07090e7f;
 `;
 
-const SlideBody = styled.div``;
-
 const SlideGroupIndicator = styled.div<SlideGroupIndicatorProps>`
-  bottom: 0%;
   height: 10px;
   background-color: ${(p) => p.groupId || "gray"};
   border-radius: 5px;
@@ -40,8 +35,8 @@ const Slide = ({
   onClick,
   onGroupChange,
 }: SlideProps) => {
-  const slideRef = useRef<HTMLDivElement>(null);
   const [openedGroupMenu, setOpenedGroupMenu] = useState(false);
+  const slideRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(150);
   const [scale, setScale] = useState(0.1);
 
@@ -79,39 +74,44 @@ const Slide = ({
       <SlideContainer
         style={{
           overflow: "hidden",
+          padding: `${slide.media ? "" : "1rem"}`,
         }}
-        className={`theme-projector-${theme}`}
+        className={theme ? `theme-projector-${theme}` : ""}
         active={active}
         onClick={onClick}
       >
-        <SlideBody
-          ref={slideRef}
-          style={{
-            height,
-            transform: `scale(${scale})`,
-          }}
-          className={`theme-slide-${theme}`}
-        >
-          {slide.text.split("\n").map((t, idx) => (
-            <Text key={idx}>{t}</Text>
-          ))}
-        </SlideBody>
-        <SlideGroupIndicatorMenu
-          opened={openedGroupMenu}
-          onChange={setOpenedGroupMenu}
-          // TODO: this needs to be dynamic to allow editing library files as well
-          onGroupChange={onGroupChange}
-        >
-          <SlideGroupIndicator groupId={Groups[slide.group]} />
-        </SlideGroupIndicatorMenu>
+        {slide.media ? (
+          <MediaSlide slide={slide} />
+        ) : (
+          <div
+            ref={slideRef}
+            style={{
+              height,
+              transform: `${slide.media ? "unset" : `scale(${scale})`}`,
+            }}
+            className={theme ? `theme-slide-${theme}` : ""}
+          >
+            <TextSlide slide={slide} onGroupChange={onGroupChange} />
+          </div>
+        )}
+        {slide.group && (
+          <SlideGroupIndicatorMenu
+            opened={openedGroupMenu}
+            onChange={setOpenedGroupMenu}
+            // TODO: this needs to be dynamic to allow editing library files as well
+            onGroupChange={onGroupChange}
+          >
+            <SlideGroupIndicator groupId={Groups[slide.group]} />
+          </SlideGroupIndicatorMenu>
+        )}
       </SlideContainer>
     </>
   );
 };
 
 interface SlideProps {
-  slide: SlideEntryType | LibrarySlideEntryType;
-  theme: string;
+  slide: SlideEntryType;
+  theme?: string;
   active: boolean;
   onClick: () => void;
   onGroupChange: (group: GroupType) => void;

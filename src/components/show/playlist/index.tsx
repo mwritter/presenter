@@ -6,6 +6,7 @@ import PlaylistEditToolBar from "../../library/playlists/PlaylistEditToolBar";
 import PlaylistSectionToolBar from "../../library/playlists/PlaylistSectionToolBar";
 import Slide from "../slide/Slide";
 import { editPlaylistSlideData } from "../../../helpers/playlist.helper";
+import { SlideEntryType } from "../../../types/LibraryTypes";
 
 const ShowViewGrid = styled.div`
   display: grid;
@@ -42,7 +43,7 @@ const PlaylistShowView = () => {
                 return (
                   <Slide
                     key={idx}
-                    theme={section.theme}
+                    theme={section?.theme}
                     active={activeSlideId === section.id + idx}
                     slide={slide}
                     onClick={() => {

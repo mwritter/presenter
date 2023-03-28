@@ -7,8 +7,10 @@ import {
   renameFile,
   writeTextFile,
 } from "@tauri-apps/api/fs";
+import { v4 as uuid } from "uuid";
 import useStore from "../store";
 import {
+  MediaEntryType,
   PlaylistEntryType,
   PlaylistType,
   SlideEntryType,
@@ -173,3 +175,42 @@ export const addContent = async (name: string, libraryName: string) => {
   playlist.content = [...playlist.content, content];
   await write(name, playlist);
 };
+
+export const addMediaContent = async (
+  name: string,
+  mediaContent: MediaEntryType[]
+) => {
+  const media = useStore.getState().media;
+  console.log({ mediaContent });
+  if (media) {
+    const playlist = await parsePlaylist(name);
+    console.log({ playlist });
+    playlist.content = [
+      ...playlist.content,
+      {
+        id: uuid(),
+        name: media.name,
+        slides: mediaContent.map((content) => ({
+          id: uuid(),
+          media: content,
+        })),
+      },
+    ];
+    await write(name, playlist);
+  }
+};
+// {
+//   "name": "Graphics",
+//   "path": "not / needed / ?",
+//   "slides": [
+//     {
+//       "id": "1-uuid",
+//       "media": {
+//         "name": "name",
+//         "thumbnail": "asset://localhost/%2FUsers%2Fmatthewritter%2FLibrary%2FApplication%20Support%2Fcom.presenter-lite%2Fmedia%2Fassets%2Fthumbnail%2FGraphics%2Fblissed-sky-hard_light_HD.png",
+//         "source": "asset://localhost/%2FUsers%2Fmatthewritter%2FLibrary%2FApplication%20Support%2Fcom.presenter-lite%2Fmedia%2Fassets%2Fsource%2FGraphics%2Fblissed-sky-hard_light_HD.mp4"
+//       }
+//     }
+//   ],
+//   "theme": "default" <=== not used / needed for media slides
+// }

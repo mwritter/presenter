@@ -1,5 +1,5 @@
 import { ActionIcon } from "@mantine/core";
-import { IconPlus } from "@tabler/icons-react";
+import { IconPhotoPlus, IconPlus } from "@tabler/icons-react";
 import { open } from "@tauri-apps/api/dialog";
 import { addMediaImageFile } from "../../../helpers/media.helper";
 
@@ -24,7 +24,7 @@ const MediaFileInput = () => {
   return (
     <>
       <ActionIcon variant="transparent" onClick={() => getFileAndSave()}>
-        <IconPlus size={16} />
+        <IconPhotoPlus size={16} />
       </ActionIcon>
     </>
   );
