@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
+import { renameMedia } from "../../../helpers/media.helper";
 import { addMediaContent } from "../../../helpers/playlist.helper";
 
 import useStore from "../../../store";
@@ -56,7 +57,7 @@ const MediaEditToolBar = ({
   const [mediaName, setMediaName] = useState<string>();
 
   useEffect(() => {
-    if (media) setMediaName(media.name);
+    if (media) setMediaName(media.name.split(".")[0]);
   }, [media]);
 
   return media ? (
@@ -79,9 +80,9 @@ const MediaEditToolBar = ({
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                //   renameMedia(mediaName, media).then(() =>
-                //     setEditMedia(false)
-                //   );
+                if (mediaName?.trim().length) {
+                  renameMedia(mediaName).then(() => setEditMedia(false));
+                }
               } else if (e.key === "Escape") {
                 setMediaName(media.name);
                 setEditMedia(false);
@@ -90,7 +91,7 @@ const MediaEditToolBar = ({
           />
         ) : (
           <Title order={5} color={"white"}>
-            {media.name}
+            {media.name.split(".")[0]}
           </Title>
         )}
       </Group>

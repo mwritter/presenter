@@ -3,10 +3,12 @@ import { ActionIcon, Text, TextProps, Title } from "@mantine/core";
 import useStore from "../../../store";
 import { useEffect, useState } from "react";
 import {
+  create,
   getMediaDirContents,
   getMediaFileData,
 } from "../../../helpers/media.helper";
 import { IconPlus } from "@tabler/icons-react";
+import MediaAddInput from "./MediaAddInput";
 
 const MediaDirContainer = styled.section``;
 
@@ -51,8 +53,8 @@ const MediaDirView = () => {
   const [mediaFiles, media, setMedia] = useStore(
     ({ mediaFiles, media, setMedia }) => [mediaFiles, media, setMedia]
   );
-  const [selected, setSelected] = useState<string>(media?.path || "");
-
+  const [selected, setSelected] = useState<string>(media?.name || "");
+  const [addInput, setAddInput] = useState(false);
   useEffect(() => {
     getMediaDirContents();
   }, []);
@@ -61,18 +63,28 @@ const MediaDirView = () => {
     <MediaDirContainer>
       <MediaHeaderContainer>
         <MediaDirTitle order={6}>MEDIA</MediaDirTitle>
-        <ActionIcon>
+        <ActionIcon onClick={() => setAddInput(true)}>
           <IconPlus size={16} />
         </ActionIcon>
       </MediaHeaderContainer>
       <ScrollableList>
+        {addInput && (
+          <MediaAddInput
+            onClose={() => setAddInput(false)}
+            onEnter={(value) => {
+              create(value + ".json").then(() => {
+                setAddInput(false);
+              });
+            }}
+          />
+        )}
         {mediaFiles
           .filter((f) => !/^\./.test(f?.name || ""))
           .map((f) => {
             return !f.children ? (
               <div key={f.path}>
                 <MediaEntry
-                  selected={selected === f.path}
+                  selected={selected === f.name}
                   key={f.path}
                   onClick={() => {
                     getMediaFileData(f.path).then(setMedia);

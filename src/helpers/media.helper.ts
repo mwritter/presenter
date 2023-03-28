@@ -5,6 +5,7 @@ import {
   exists,
   readDir,
   readTextFile,
+  renameFile,
   writeTextFile,
 } from "@tauri-apps/api/fs";
 import { appDataDir } from "@tauri-apps/api/path";
@@ -168,4 +169,40 @@ export const createMediaFileThumbnail = async (sourceFilePath: string) => {
     }
   }
   return thumbnailFilePath;
+};
+
+export const renameMedia = async (name: string) => {
+  const media = useStore.getState().media;
+  if (media) {
+    const newName = `${name}`;
+    await renameFile(`media/${media.name}`, `media/${newName}`, {
+      dir: BaseDirectory.AppData,
+    });
+    media.name = newName;
+    await write(media);
+  }
+};
+
+export const write = async (media: MediaType) => {
+  const content = JSON.stringify(media);
+  await writeTextFile(`media/${media.name}`, content, {
+    dir: BaseDirectory.AppData,
+  });
+  useStore.getState().setMedia(media);
+  await getMediaDirContents();
+};
+
+export const create = async (name: string) => {
+  await createMedia(name);
+  await getMediaDirContents();
+};
+
+export const createMedia = async (name: string) => {
+  const mediaFile: MediaType = {
+    name,
+    items: [],
+  };
+  await writeTextFile(`media/${name}`, JSON.stringify(mediaFile), {
+    dir: BaseDirectory.AppData,
+  });
 };

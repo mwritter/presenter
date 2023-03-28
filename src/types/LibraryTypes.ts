@@ -19,7 +19,6 @@ export type PlaylistMediaEntryType = MediaEntryType & {
 
 export type MediaType = {
   name: string;
-  path: string;
   items: MediaEntryType[];
 };
 
