@@ -39,6 +39,20 @@ const SlideBody = styled.div`
   height: 100%;
 `;
 
+const ProjectorVideo = styled.video`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+`;
+
+const ProjectorImg = styled.img`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+`;
+
 const Projector = () => {
   const slideRef = createRef<HTMLDivElement>();
   const containerRef = createRef<HTMLElement>();
@@ -88,16 +102,22 @@ const Projector = () => {
   return (
     <>
       {slide ? (
-        <ProjectorContainer ref={containerRef} id="Projector">
+        <ProjectorContainer
+          style={{
+            position: "relative",
+          }}
+          ref={containerRef}
+          id="Projector"
+        >
           <SlideContainer className={`theme-projector-${theme}`}>
             <SlideBody className={`theme-slide-${theme}`} ref={slideRef}>
               {slide.text?.split("\n").map((t, idx) => (
-                <Text key={idx}>{t}</Text>
+                <Text style={{ zIndex: 1 }} key={idx}>
+                  {t}
+                </Text>
               ))}
-              {media.img && <img src={media.img} height="100%" />}
-              {media.video && (
-                <video autoPlay src={media.video} height="100%" />
-              )}
+              {media.img && <ProjectorImg src={media.img} />}
+              {media.video && <ProjectorVideo autoPlay src={media.video} />}
             </SlideBody>
           </SlideContainer>
         </ProjectorContainer>

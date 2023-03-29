@@ -74,20 +74,22 @@ const Slide = ({
       <SlideContainer
         style={{
           overflow: "hidden",
-          padding: `${slide.media ? "" : "1rem"}`,
+          padding: `${slide.media?.thumbnail ? "" : "1rem"}`,
         }}
         className={theme ? `theme-projector-${theme}` : ""}
         active={active}
         onClick={onClick}
       >
-        {slide.media ? (
+        {slide.media?.thumbnail ? (
           <MediaSlide slide={slide} />
         ) : (
           <div
             ref={slideRef}
             style={{
               height,
-              transform: `${slide.media ? "unset" : `scale(${scale})`}`,
+              transform: `${
+                slide.media?.thumbnail ? "unset" : `scale(${scale})`
+              }`,
             }}
             className={theme ? `theme-slide-${theme}` : ""}
           >

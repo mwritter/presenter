@@ -40,7 +40,9 @@ function PlaylistChangeThemeMenu({
   const [opened, setOpened] = useState(false);
 
   useEffect(() => {
-    getThemeEnties().then(setThemes);
+    getThemeEnties().then((entries) => {
+      setThemes(entries.map(({ name }) => name));
+    });
   }, []);
 
   return (

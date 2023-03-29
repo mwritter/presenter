@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import { Text, TextProps } from "@mantine/core";
 import { PlaylistEntryType } from "../../../types/LibraryTypes";
+import DndListHandle from "../dnd";
 
 const PlaylistContentEntriesContainer = styled.div`
   position: relative;
@@ -27,21 +28,8 @@ const PlaylistItem = styled(Text)<TextProps>`
 `;
 
 const PlaylistContentEntries = ({ items }: PlaylistContentEntriesProps) => {
-  return (
-    <>
-      {items && (
-        <>
-          <PlaylistContentEntriesContainer>
-            {items.map((item, idx) => (
-              <PlaylistItem key={`${item.name}-${idx}`}>
-                {item.name?.split(".")[0]}
-              </PlaylistItem>
-            ))}
-          </PlaylistContentEntriesContainer>
-        </>
-      )}
-    </>
-  );
+  console.log(items);
+  // return <DndListHandle data={items} />;
 };
 
 interface PlaylistContentEntriesProps {

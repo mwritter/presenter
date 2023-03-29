@@ -13,6 +13,7 @@ import { convertFileSrc } from "@tauri-apps/api/tauri";
 import useStore from "../store";
 import { MediaEntryType, MediaType } from "../types/LibraryTypes";
 import { Command } from "@tauri-apps/api/shell";
+import { v4 as uuid } from "uuid";
 /**
  * media
  * |    ...media entry json files
@@ -87,14 +88,14 @@ export const addMediaEntryFile = async (
 ) => {
   const media = useStore.getState().media;
 
-  const fileExists = await exists(`media/${mediaFileName}.json`, {
+  const fileExists = await exists(`media/${mediaFileName}`, {
     dir: BaseDirectory.AppData,
   });
   if (!fileExists) return;
 
   if (media) {
     media.items.push(content);
-    await writeTextFile(`media/${mediaFileName}.json`, JSON.stringify(media), {
+    await writeTextFile(`media/${mediaFileName}`, JSON.stringify(media), {
       dir: BaseDirectory.AppData,
     });
   }
@@ -107,7 +108,7 @@ export const addMediaImageFile = async (fileSystemPath: string) => {
   if (!media) return;
   const dir = await appDataDir();
   const fileName = fileSystemPath.split("/").pop() || "";
-  const sourceDes = `${dir}media/assets/source/${media.name}/${fileName}`;
+  const sourceDes = `${dir}media/assets/source/${media.id}/${fileName}`;
 
   const source = await invoke("copy_file_to", {
     sourcePath: fileSystemPath,
@@ -137,7 +138,7 @@ export const createMediaFileThumbnail = async (sourceFilePath: string) => {
   if (!media) return;
   const dir = await appDataDir();
   const [fileName, ext] = sourceFilePath.split("/").pop()?.split(".") || [];
-  const thumbnailFilePath = `${dir}media/assets/thumbnail/${media.name}/${fileName}.png`;
+  const thumbnailFilePath = `${dir}media/assets/thumbnail/${media.id}/${fileName}.png`;
   if (["mp4", "mov"].includes(ext)) {
     console.log("ffmpeg - video");
 
@@ -198,11 +199,24 @@ export const create = async (name: string) => {
 };
 
 export const createMedia = async (name: string) => {
+  const id = uuid();
   const mediaFile: MediaType = {
+    id,
     name,
     items: [],
   };
+  // create entry file
   await writeTextFile(`media/${name}`, JSON.stringify(mediaFile), {
     dir: BaseDirectory.AppData,
+  });
+  // create thumbnail dir
+  await createDir(`media/assets/thumbnail/${id}`, {
+    dir: BaseDirectory.AppData,
+    recursive: true,
+  });
+  // create source dir
+  await createDir(`media/assets/source/${id}`, {
+    dir: BaseDirectory.AppData,
+    recursive: true,
   });
 };

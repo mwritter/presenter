@@ -6,12 +6,14 @@ import {
   create,
   getPlaylistData,
   getPlaylistsDirContents,
+  write,
 } from "../../../helpers/playlist.helper";
 import useStore from "../../../store";
 import PlaylistAddInput from "./PlaylistAddInput";
 import PlaylistContentEntries from "./PlaylistContentEntries";
 import { PlaylistEntryType } from "../../../types/LibraryTypes";
 import PlaylistDirEntry from "./PlaylistDirEntry";
+import DndListHandle from "../dnd";
 
 const PlaylistDirContainer = styled.section`
   display: flex;
@@ -36,7 +38,6 @@ const PlaylistDirTitle = styled(Title)`
 `;
 
 const PlaylistDirView = () => {
-  const [items, setItems] = useState<PlaylistEntryType[]>([]);
   const [playlists, playlist, setPlaylist] = useStore(
     ({ playlists, playlist, setPlaylist }) => [playlists, playlist, setPlaylist]
   );
@@ -45,12 +46,6 @@ const PlaylistDirView = () => {
   useEffect(() => {
     getPlaylistsDirContents();
   }, []);
-
-  useEffect(() => {
-    if (playlist) {
-      setItems(playlist.content);
-    }
-  }, [playlist]);
 
   return (
     <PlaylistDirContainer>
@@ -87,9 +82,15 @@ const PlaylistDirView = () => {
               >
                 <PlaylistDirEntry file={file} />
               </h3>
-              {file.name === playlist?.name && (
-                <PlaylistContentEntries items={items} />
-              )}
+              {playlist && file.name === playlist?.name ? (
+                <DndListHandle
+                  data={playlist.content}
+                  onReorder={(content) => {
+                    playlist.content = content;
+                    write(playlist.name, playlist);
+                  }}
+                />
+              ) : null}
             </div>
           ))}
       </Box>

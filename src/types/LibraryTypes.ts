@@ -8,7 +8,7 @@ export type PlaylistType = {
 export type PlaylistEntryType = {
   id: string;
   theme?: string;
-  name?: string;
+  name: string;
   path?: string;
   slides: SlideEntryType[];
 };
@@ -18,6 +18,7 @@ export type PlaylistMediaEntryType = MediaEntryType & {
 };
 
 export type MediaType = {
+  id: string;
   name: string;
   items: MediaEntryType[];
 };
@@ -73,3 +74,10 @@ export enum PresenterMode {
   LIBRARY,
   MEDIA,
 }
+
+export type ThemeEntryType = {
+  name: string;
+  media?: {
+    source: string;
+  };
+};
