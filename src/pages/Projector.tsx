@@ -5,6 +5,8 @@ import { createRef, useEffect, useState } from "react";
 import ProjectorStyle from "../components/projector/ProjectorStyle";
 import { MediaEntryType, SlideEntryType } from "../types/LibraryTypes";
 import { appWindow } from "@tauri-apps/api/window";
+import { motion, AnimatePresence } from "framer-motion";
+import TextSlide from "../components/show/slide/TextSlide";
 
 const listenForSlideChanges = async (
   callBack: (slide: SlideEntryType & { theme: string }) => void
@@ -12,7 +14,6 @@ const listenForSlideChanges = async (
   await listen<SlideEntryType & { theme: string }>(
     "set-slide",
     ({ payload }) => {
-      console.log({ payload });
       callBack(payload);
     }
   );
@@ -56,13 +57,16 @@ const ProjectorImg = styled.img`
 const Projector = () => {
   const slideRef = createRef<HTMLDivElement>();
   const containerRef = createRef<HTMLElement>();
-  const [slide, setSlide] = useState<SlideEntryType & { theme: string }>();
+  const [slide, setSlide] = useState<
+    (SlideEntryType & { theme: string }) | null
+  >();
   const [theme, setTheme] = useState<string | null>();
   const [media, setMedia] = useState<Record<string, string | null>>({
     img: null,
     video: null,
   });
 
+  // TODO: going to need to trigger a re render when themes updates
   useEffect(() => {
     // TODO: unlisten to these events on
     const unlisten = [
@@ -109,15 +113,30 @@ const Projector = () => {
           ref={containerRef}
           id="Projector"
         >
-          <SlideContainer className={`theme-projector-${theme}`}>
+          <SlideContainer
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              textAlign: "center",
+              backgroundColor: "black",
+            }}
+          >
             <SlideBody className={`theme-slide-${theme}`} ref={slideRef}>
-              {slide.text?.split("\n").map((t, idx) => (
-                <Text style={{ zIndex: 1 }} key={idx}>
-                  {t}
-                </Text>
-              ))}
-              {media.img && <ProjectorImg src={media.img} />}
-              {media.video && <ProjectorVideo autoPlay src={media.video} />}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={slide.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                >
+                  <TextSlide slide={slide} />
+                  {media.img && <ProjectorImg src={media.img} />}
+                  {media.video && <ProjectorVideo autoPlay src={media.video} />}
+                </motion.div>
+              </AnimatePresence>
             </SlideBody>
           </SlideContainer>
         </ProjectorContainer>

@@ -32,17 +32,17 @@ const ThemeEntry = styled(Text)<ThemeEntryProps>`
 function PlaylistChangeThemeMenu({
   onHandleThemeChange,
 }: PlaylistThemeMenuProps) {
-  const { playlist, projector } = useStore(({ playlist, projector }) => ({
-    playlist,
-    projector,
-  }));
-  const [themes, setThemes] = useState<string[]>([]);
+  const { themes, playlist, projector } = useStore(
+    ({ themes, playlist, projector }) => ({
+      themes,
+      playlist,
+      projector,
+    })
+  );
   const [opened, setOpened] = useState(false);
 
   useEffect(() => {
-    getThemeEnties().then((entries) => {
-      setThemes(entries.map(({ name }) => name));
-    });
+    getThemeEnties();
   }, []);
 
   return (
@@ -55,19 +55,19 @@ function PlaylistChangeThemeMenu({
 
       <ThemeMenuDropdown>
         <Menu.Label>Add to Playlist</Menu.Label>
-        {themes.map((themeName, idx) => {
+        {themes.map(({ name }, idx) => {
           return (
             <ThemeEntry
               index={idx}
-              key={themeName}
+              key={name}
               onClick={() => {
-                if (playlist && themeName) {
-                  onHandleThemeChange(themeName);
+                if (playlist && name) {
+                  onHandleThemeChange(name);
                   setOpened(false);
                 }
               }}
             >
-              {themeName}
+              {name}
             </ThemeEntry>
           );
         })}

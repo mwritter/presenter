@@ -9,7 +9,7 @@ import { SlideEntryType } from "../../../types/LibraryTypes";
 import { TauriEvent } from "@tauri-apps/api/event";
 import MediaSlide from "./MediaSlide";
 import TextSlide from "./TextSlide";
-
+import { motion } from "framer-motion";
 interface SliderContainerProps {
   active?: boolean;
 }
@@ -18,7 +18,6 @@ const SlideContainer = styled.div<SliderContainerProps>`
   border: 3px solid ${(p) => (p.active ? "#9DC08B" : "#ccc")};
   border-radius: 5px;
   cursor: pointer;
-  background-color: #07090e7f;
 `;
 
 const SlideGroupIndicator = styled.div<SlideGroupIndicatorProps>`
@@ -37,11 +36,10 @@ const Slide = ({
 }: SlideProps) => {
   const [openedGroupMenu, setOpenedGroupMenu] = useState(false);
   const slideRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(150);
+  const [height, setHeight] = useState(0);
   const [scale, setScale] = useState(0.1);
 
-  const { playlist, projector } = useStore(({ playlist, projector }) => ({
-    playlist,
+  const { projector } = useStore(({ projector }) => ({
     projector,
   }));
 
@@ -67,7 +65,7 @@ const Slide = ({
         scaleSlide(width, height);
       });
     });
-  }, []);
+  }, [projector]);
 
   return (
     <>
@@ -75,8 +73,8 @@ const Slide = ({
         style={{
           overflow: "hidden",
           padding: `${slide.media?.thumbnail ? "" : "1rem"}`,
+          opacity: `${!height && !slide.media?.thumbnail ? 0 : 1}`,
         }}
-        className={theme ? `theme-projector-${theme}` : ""}
         active={active}
         onClick={onClick}
       >
@@ -93,7 +91,7 @@ const Slide = ({
             }}
             className={theme ? `theme-slide-${theme}` : ""}
           >
-            <TextSlide slide={slide} onGroupChange={onGroupChange} />
+            <TextSlide slide={slide} />
           </div>
         )}
         {slide.group && (

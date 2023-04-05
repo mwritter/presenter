@@ -9,14 +9,18 @@ body,
 .App {
   overflow: hidden;
   background-color: #282c34;
+  height: 100vh;
 }
 
 #Presenter {
   display: grid;
-  grid-template-areas: "library show";
+  grid-template-areas:
+    "toolbar toolbar"
+    "library show";
   grid-template-columns: auto 1fr;
-  height: 100vh;
+  grid-template-rows: auto 1fr;
   background-color: #282c34;
+  height: 100%;
 }
 
 /* Scrollbar styles */

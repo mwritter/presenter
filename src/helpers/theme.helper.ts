@@ -5,7 +5,25 @@ import {
   readTextFile,
   writeTextFile,
 } from "@tauri-apps/api/fs";
+import { CSSProperties } from "react";
 import { ThemeEntryType } from "../types/LibraryTypes";
+import { defatulTheme } from "../components/show/theme/styles/default";
+import useStore from "../store";
+
+/**
+ * Theme Entries Shape
+ * [
+ *    {
+ *      name: 'default',
+ *      style: {
+ *        fontFamily: "Arial"
+ *        ...
+ *      },
+ *      media: { source: "path/to/image/use/for/background" }
+ *    },
+ *    ...
+ * ]
+ */
 
 export const createThemeDir = async () => {
   await createDir("themes", {
@@ -14,33 +32,48 @@ export const createThemeDir = async () => {
   });
   await writeTextFile(
     "themes/index.json",
-    JSON.stringify([{ name: "default" }]),
+    JSON.stringify([
+      {
+        name: "default",
+        style: defatulTheme,
+      },
+    ]),
     {
       dir: BaseDirectory.AppData,
     }
   );
-  await writeTextFile(
-    "themes/index.css",
-    `
-    /* ====== default ======  */
-    .theme-projector-default {
-      display: flex;
-      flex-direction: column;
-      background: black;
+};
+
+export const write = async (content: ThemeEntryType[]) => {
+  await writeTextFile("themes/index.json", JSON.stringify(content), {
+    dir: BaseDirectory.AppData,
+  });
+  await getThemeEnties();
+};
+
+export const addThemeEntry = async (
+  name: string,
+  style: ThemeEntryType["style"]
+) => {
+  const currentThemes = useStore.getState().themes;
+  const newThemes: ThemeEntryType[] = [...currentThemes, { name, style }];
+
+  await write(newThemes);
+};
+
+export const editThemeEntry = async (
+  name: string,
+  style: ThemeEntryType["style"]
+) => {
+  const currentThemes = useStore.getState().themes;
+  const updatedThemes = currentThemes.map((theme) => {
+    if (theme.name === name) {
+      return { ...theme, style };
     }
-    .theme-slide-default {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-size: 80px;
-      white-space: nowrap;
-    }
-    /* ====== default ======  */
-  `,
-    { dir: BaseDirectory.AppData }
-  );
+    return theme;
+  });
+
+  await write(updatedThemes);
 };
 
 export const getThemeEnties = async () => {
@@ -54,7 +87,17 @@ export const getThemeEnties = async () => {
     dir: BaseDirectory.AppData,
   });
   const entries: ThemeEntryType[] = JSON.parse(themes);
-  return entries;
+  useStore.getState().setThemes(entries);
+};
+
+export const buildCSS = (themes: ThemeEntryType[]) => {
+  return themes.reduce((pre, cur) => {
+    return `${pre} .theme-slide-${cur.name} ${JSON.stringify(cur.style)
+      .replace(/([a-z])([A-Z])/g, "$1-$2")
+      .toLowerCase()
+      .replaceAll(/\"/g, "")
+      .replaceAll(",", ";")}`;
+  }, "");
 };
 
 // TODO: Remove theme

@@ -1,6 +1,11 @@
 import styled from "@emotion/styled";
 import { Center, SegmentedControl } from "@mantine/core";
-import { IconFolder, IconPhoto, IconPlayerPlay } from "@tabler/icons-react";
+import {
+  IconFolder,
+  IconPhoto,
+  IconPlayerPlay,
+  IconSquare,
+} from "@tabler/icons-react";
 import useStore from "../../store";
 import { PresenterMode } from "../../types/LibraryTypes";
 
@@ -57,6 +62,14 @@ const LibraryViewNav = () => {
           label: (
             <Center>
               <IconPhoto size={14} />
+            </Center>
+          ),
+        },
+        {
+          value: PresenterMode.THEME.toString(),
+          label: (
+            <Center>
+              <IconSquare size={14} />
             </Center>
           ),
         },

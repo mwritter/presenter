@@ -6,17 +6,20 @@ import {
   MediaType,
   PlaylistType,
   PresenterMode,
+  ThemeEntryType,
 } from "../types/LibraryTypes";
 
 interface AppState {
   playlist: PlaylistType | null;
   library: LibraryEntryType | null;
   media: MediaType | null;
+  theme: ThemeEntryType | null;
   show: PlaylistType | null;
   projector: WebviewWindow | null;
   playlists: FileEntry[];
   libraries: FileEntry[];
   mediaFiles: FileEntry[];
+  themes: ThemeEntryType[];
   mode: PresenterMode;
 }
 
@@ -26,7 +29,9 @@ interface Action {
   setLibraries: (libraries: FileEntry[]) => void;
   setLibrary: (library: LibraryEntryType) => void;
   setMedia: (media: MediaType) => void;
+  setTheme: (theme: ThemeEntryType) => void;
   setMediaFiles: (files: FileEntry[]) => void;
+  setThemes: (themes: ThemeEntryType[]) => void;
   setShow: (show: PlaylistType) => void;
   setProjector: (projector: WebviewWindow) => void;
   setMode: (mode: PresenterMode) => void;
@@ -36,9 +41,11 @@ const useStore = create<AppState & Action>((set) => ({
   playlists: [],
   libraries: [],
   mediaFiles: [],
+  themes: [],
   playlist: null,
   library: null,
   media: null,
+  theme: null,
   show: null,
   projector: null,
   mode: PresenterMode.PLAYLIST,
@@ -51,7 +58,9 @@ const useStore = create<AppState & Action>((set) => ({
   setLibraries: (libraries) => set(() => ({ libraries })),
   setLibrary: (library) => set(() => ({ library })),
   setMedia: (media) => set(() => ({ media })),
+  setTheme: (theme) => set(() => ({ theme })),
   setMediaFiles: (mediaFiles) => set(() => ({ mediaFiles })),
+  setThemes: (themes) => set(() => ({ themes })),
   setShow: (show) => set(() => ({ show })),
   setProjector: (projector) => set(() => ({ projector })),
   setMode: (mode) => set(() => ({ mode })),

@@ -3,6 +3,12 @@ import { WebviewWindow, availableMonitors } from "@tauri-apps/api/window";
 import ShowView from "./ShowView";
 import useStore from "../store";
 import { useEffect } from "react";
+import Toolbar from "../components/toolbar";
+
+import { fontDir } from "@tauri-apps/api/path";
+import { readDir } from "@tauri-apps/api/fs";
+import { convertFileSrc } from "@tauri-apps/api/tauri";
+const getFontsDir = async () => await fontDir();
 
 const setProjectorMonitor = async () => {
   const monitors = await availableMonitors();

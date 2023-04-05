@@ -3,6 +3,7 @@ import { Stack } from "@mantine/core";
 import { editLibrarySlideData } from "../../../helpers/library.helper";
 import useStore from "../../../store";
 import Slide from "../slide/Slide";
+import { useState } from "react";
 
 const ShowViewGrid = styled.div`
   display: grid;
@@ -15,23 +16,26 @@ const ShowViewGrid = styled.div`
 `;
 
 const LibraryShowView = () => {
+  const [loading, setLoading] = useState(false);
   const library = useStore(({ library }) => library);
   return (
     <Stack p={20} spacing={50}>
-      <ShowViewGrid>
-        {library?.slides.map((slide, idx) => (
-          <Slide
-            key={idx}
-            theme={"default"}
-            active={false}
-            slide={slide}
-            onClick={() => {}}
-            onGroupChange={(group) => {
-              editLibrarySlideData({ group }, slide.id);
-            }}
-          />
-        ))}
-      </ShowViewGrid>
+      {!loading && (
+        <ShowViewGrid>
+          {library?.slides.map((slide, idx) => (
+            <Slide
+              key={idx}
+              theme={"default"}
+              active={false}
+              slide={slide}
+              onClick={() => {}}
+              onGroupChange={(group) => {
+                editLibrarySlideData({ group }, slide.id);
+              }}
+            />
+          ))}
+        </ShowViewGrid>
+      )}
     </Stack>
   );
 };

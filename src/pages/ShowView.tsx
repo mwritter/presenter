@@ -6,6 +6,7 @@ import { PresenterMode } from "../types/LibraryTypes";
 import PlaylistShowView from "../components/show/playlist";
 import LibraryShowView from "../components/show/library";
 import MediaShowView from "../components/show/media";
+import ThemeEditor from "../components/show/theme";
 
 const ShowViewContainer = styled.section`
   position: relative;
@@ -43,6 +44,11 @@ const ShowView = () => {
       <Box hidden={mode !== PresenterMode.MEDIA}>
         <MediaShowView />
       </Box>
+      {mode === PresenterMode.THEME && (
+        <Box>
+          <ThemeEditor />
+        </Box>
+      )}
     </ShowViewContainer>
   );
 };

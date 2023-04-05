@@ -1,3 +1,4 @@
+import { CSSProperties } from "react";
 import { GroupType } from "../components/show/helpers/slide.helper";
 
 export type PlaylistType = {
@@ -73,11 +74,24 @@ export enum PresenterMode {
   PLAYLIST,
   LIBRARY,
   MEDIA,
+  THEME,
 }
 
 export type ThemeEntryType = {
   name: string;
+  style?: ThemeEntryStyleType;
   media?: {
     source: string;
   };
+};
+
+export type ThemeEntryStyleType = {
+  alignItems: CSSProperties["alignItems"];
+  justifyContent: CSSProperties["justifyContent"];
+  fontFamily: CSSProperties["fontFamily"];
+  fontSize: CSSProperties["fontSize"];
+  color: CSSProperties["color"];
+  display: CSSProperties["display"];
+  flexDirection: CSSProperties["flexDirection"];
+  whiteSpace: CSSProperties["whiteSpace"];
 };

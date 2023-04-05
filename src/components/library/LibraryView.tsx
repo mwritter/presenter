@@ -2,10 +2,10 @@ import styled from "@emotion/styled";
 import useStore from "../../store";
 import { PresenterMode } from "../../types/LibraryTypes";
 import LibraryDirView from "./libraries/LibraryDirView";
-import LibraryFileInput from "./libraries/LibraryFileInput";
 import LibraryViewNav from "./LibraryViewNav";
 import MediaDirView from "./media/MediaDirView";
 import PlaylistDirView from "./playlists/PlaylistDirView";
+import ThemeEntryView from "./theme/ThemeEntryView";
 
 const LibraryViewContainer = styled.div`
   grid-area: library;
@@ -16,9 +16,7 @@ const LibraryViewContainer = styled.div`
   width: 250px;
   background-color: #21212a;
   overflow-y: scroll;
-
-  > section {
-  }
+  height: 100%;
 
   &::-webkit-scrollbar {
     width: 1px;
@@ -36,6 +34,7 @@ const LibraryView = () => {
       {mode === PresenterMode.PLAYLIST && <PlaylistDirView />}
       {mode === PresenterMode.LIBRARY && <LibraryDirView />}
       {mode === PresenterMode.MEDIA && <MediaDirView />}
+      {mode === PresenterMode.THEME && <ThemeEntryView />}
       <LibraryViewNav />
     </LibraryViewContainer>
   );

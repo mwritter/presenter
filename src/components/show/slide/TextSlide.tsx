@@ -1,12 +1,13 @@
 import { Text } from "@mantine/core";
 import { SlideEntryType } from "../../../types/LibraryTypes";
-import { Groups, GroupType } from "../helpers/slide.helper";
 
-const TextSlide = ({ slide, onGroupChange }: TextSlideProps) => {
+const TextSlide = ({ slide }: TextSlideProps) => {
   return (
     <>
-      {slide.text?.split("\n").map((t, idx) => (
-        <Text key={idx}>{t}</Text>
+      {slide.text?.split("\n").map((text, idx) => (
+        <Text unstyled key={idx}>
+          {text}
+        </Text>
       ))}
     </>
   );
@@ -14,11 +15,6 @@ const TextSlide = ({ slide, onGroupChange }: TextSlideProps) => {
 
 interface TextSlideProps {
   slide: SlideEntryType;
-  onGroupChange: (groupId: GroupType) => void;
-}
-
-interface SlideGroupIndicatorProps {
-  groupId: Groups;
 }
 
 export default TextSlide;

@@ -7,9 +7,7 @@ import React, { useEffect, useState } from "react";
 // TODO: just a button for toggling the projector for now
 const ShowProjectorButton = () => {
   const [projector, setProjector] = useState<WebviewWindow | null>(null);
-  useEffect(() => {
-    console.log({ projector });
-  }, [projector]);
+
   return (
     <span>
       {projector ? (
@@ -29,9 +27,7 @@ const ShowProjectorButton = () => {
         <ActionIcon
           variant="transparent"
           onClick={() => {
-            console.log("clicked");
             if (projector) return;
-            console.log("no projector");
 
             const webview = new WebviewWindow("projector", {
               url: "/projector",

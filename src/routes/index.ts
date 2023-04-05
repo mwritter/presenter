@@ -5,7 +5,7 @@ export function RouterElement() {
   const routes = [
     {
       path: "/",
-      name: "Home",
+      name: "Presenter",
       element: lazyLoadRoutes("Presenter"),
     },
     {
