@@ -7,6 +7,7 @@ import PlaylistSectionToolBar from "../../library/playlists/PlaylistSectionToolB
 import Slide from "../slide/Slide";
 import { editPlaylistSlideData } from "../../../helpers/playlist.helper";
 import { motion, AnimatePresence } from "framer-motion";
+import { emit } from "@tauri-apps/api/event";
 
 const ShowViewGrid = styled.div`
   display: grid;
@@ -56,9 +57,10 @@ const PlaylistShowView = () => {
                           slide={slide}
                           onClick={() => {
                             setActiveSlideId(section.id + idx);
-                            projector?.emit("set-slide", {
+                            emit("set-slide", {
                               ...slide,
                               theme: section.theme,
+                              next: section?.slides[idx + 1] || null,
                             });
                           }}
                           onGroupChange={(group) => {

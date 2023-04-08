@@ -13,13 +13,3 @@ export const defatulTheme: ThemeEntryType = {
     whiteSpace: "nowrap",
   },
 };
-
-// .theme-slide-default {
-//     display: flex;
-//     flex-direction: column;
-//     justify-content: center;
-//     align-items: center;
-//     color: white;
-//     font-size: 80px;
-//     white-space: nowrap;
-//   }

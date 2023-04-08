@@ -1,15 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import styled from "@emotion/styled";
 import { Groups, GroupType } from "../helpers/slide.helper";
 import SlideGroupIndicatorMenu from "./SlideGroupIndicatorMenu";
-import useStore from "../../../store";
-import { editPlaylistSlideData } from "../../../helpers/playlist.helper";
-import { Text } from "@mantine/core";
 import { SlideEntryType } from "../../../types/LibraryTypes";
-import { TauriEvent } from "@tauri-apps/api/event";
 import MediaSlide from "./MediaSlide";
 import TextSlide from "./TextSlide";
-import { motion } from "framer-motion";
+import useProjectorScale from "../../../hooks/useProjectorScale";
 interface SliderContainerProps {
   active?: boolean;
 }
@@ -36,44 +32,18 @@ const Slide = ({
 }: SlideProps) => {
   const [openedGroupMenu, setOpenedGroupMenu] = useState(false);
   const slideRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(0);
-  const [scale, setScale] = useState(0.1);
-
-  const { projector } = useStore(({ projector }) => ({
-    projector,
-  }));
-
-  const scaleSlide = useCallback(
-    (projectorWidth: number, projectorHeight: number) => {
-      if (!slideRef.current) return;
-      const { clientWidth: width } = slideRef.current;
-      const quotient = projectorHeight / projectorWidth;
-      const newHeight = quotient * width;
-      setHeight(newHeight);
-      setScale((width / projectorWidth) * 2.2);
-    },
-    []
-  );
-
-  useEffect(() => {
-    projector?.outerSize().then(({ width, height }) => {
-      scaleSlide(width, height);
-    });
-    // For debugging
-    projector?.listen(TauriEvent.WINDOW_RESIZED, () => {
-      projector?.outerSize().then(({ width, height }) => {
-        scaleSlide(width, height);
-      });
-    });
-  }, [projector]);
+  // TODO: Move this higher up
+  const { value, height, width, projectorHeight, projectorWidth } =
+    useProjectorScale({ width: 350 });
 
   return (
     <>
       <SlideContainer
         style={{
           overflow: "hidden",
-          padding: `${slide.media?.thumbnail ? "" : "1rem"}`,
           opacity: `${!height && !slide.media?.thumbnail ? 0 : 1}`,
+          height: height,
+          width: width,
         }}
         active={active}
         onClick={onClick}
@@ -84,10 +54,10 @@ const Slide = ({
           <div
             ref={slideRef}
             style={{
-              height,
-              transform: `${
-                slide.media?.thumbnail ? "unset" : `scale(${scale})`
-              }`,
+              height: projectorHeight,
+              width: projectorWidth,
+              transformOrigin: "left top",
+              transform: `scale(${value})`,
             }}
             className={theme ? `theme-slide-${theme}` : ""}
           >

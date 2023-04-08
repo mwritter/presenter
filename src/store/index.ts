@@ -15,7 +15,12 @@ interface AppState {
   media: MediaType | null;
   theme: ThemeEntryType | null;
   show: PlaylistType | null;
-  projector: WebviewWindow | null;
+  projector: {
+    webview: WebviewWindow;
+    height: number;
+    width: number;
+  } | null;
+  prompt: WebviewWindow | null;
   playlists: FileEntry[];
   libraries: FileEntry[];
   mediaFiles: FileEntry[];
@@ -33,7 +38,12 @@ interface Action {
   setMediaFiles: (files: FileEntry[]) => void;
   setThemes: (themes: ThemeEntryType[]) => void;
   setShow: (show: PlaylistType) => void;
-  setProjector: (projector: WebviewWindow) => void;
+  setProjector: (projector: {
+    webview: WebviewWindow;
+    height: number;
+    width: number;
+  }) => void;
+  setPrompt: (prompt: WebviewWindow) => void;
   setMode: (mode: PresenterMode) => void;
 }
 
@@ -48,6 +58,7 @@ const useStore = create<AppState & Action>((set) => ({
   theme: null,
   show: null,
   projector: null,
+  prompt: null,
   mode: PresenterMode.PLAYLIST,
   setPlaylists: (playlists) => {
     set(() => ({ playlists }));
@@ -63,6 +74,7 @@ const useStore = create<AppState & Action>((set) => ({
   setThemes: (themes) => set(() => ({ themes })),
   setShow: (show) => set(() => ({ show })),
   setProjector: (projector) => set(() => ({ projector })),
+  setPrompt: (prompt) => set(() => ({ prompt })),
   setMode: (mode) => set(() => ({ mode })),
 }));
 

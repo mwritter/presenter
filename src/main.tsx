@@ -4,12 +4,13 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import PresenterStyle from "./components/presenter/PresenterStyle";
 import "./styles.css";
+import SlideThemeStyles from "./components/style";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <>
-    <PresenterStyle />
+  <MantineProvider withGlobalStyles withNormalizeCSS>
+    <SlideThemeStyles />
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </>
+  </MantineProvider>
 );

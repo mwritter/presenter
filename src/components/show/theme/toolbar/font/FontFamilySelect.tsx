@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { Select, Text } from "@mantine/core";
 import { CSSProperties, forwardRef, useEffect, useState } from "react";
-import { getUserFonts } from "../../../helpers/font.helper";
+import { getUserFonts } from "../../../../../helpers/font.helper";
 
 const FontSelect = styled(Select)`
   & .mantine-Input-input {

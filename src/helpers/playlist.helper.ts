@@ -181,10 +181,8 @@ export const addMediaContent = async (
   mediaContent: MediaEntryType[]
 ) => {
   const media = useStore.getState().media;
-  console.log({ mediaContent });
   if (media) {
     const playlist = await parsePlaylist(name);
-    console.log({ playlist });
     playlist.content = [
       ...playlist.content,
       {

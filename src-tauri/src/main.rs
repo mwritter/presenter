@@ -3,12 +3,6 @@
 
 use std::fs;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[tauri::command]
 fn copy_file_to(source_path: &str, destination_path: &str) -> String {
     match fs::copy(source_path, destination_path) {
@@ -19,7 +13,7 @@ fn copy_file_to(source_path: &str, destination_path: &str) -> String {
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, copy_file_to])
+        .invoke_handler(tauri::generate_handler![copy_file_to])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -2,12 +2,12 @@ import styled from "@emotion/styled";
 import { ActionIcon, Text } from "@mantine/core";
 import { IconBrush, IconPlayerPlay } from "@tabler/icons-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import useStore from "../../store";
-import { PresenterMode } from "../../types/LibraryTypes";
+import useStore from "../../../../store";
+import { PresenterMode } from "../../../../types/LibraryTypes";
 
 const ToolbarStyled = styled.div`
   grid-area: toolbar;
-  background-color: #21212a;
+  background-color: green;
   padding: 1rem;
   border: 5px solid #282c34;
   border-radius: 10px;

@@ -5,8 +5,11 @@ import {
   readTextFile,
   writeTextFile,
 } from "@tauri-apps/api/fs";
-import { CSSProperties } from "react";
-import { ThemeEntryType } from "../types/LibraryTypes";
+import {
+  ThemeEntryStyleType,
+  ThemeEntryStyleTypeKey,
+  ThemeEntryType,
+} from "../types/LibraryTypes";
 import { defatulTheme } from "../components/show/theme/styles/default";
 import useStore from "../store";
 
@@ -91,13 +94,29 @@ export const getThemeEnties = async () => {
 };
 
 export const buildCSS = (themes: ThemeEntryType[]) => {
-  return themes.reduce((pre, cur) => {
-    return `${pre} .theme-slide-${cur.name} ${JSON.stringify(cur.style)
-      .replace(/([a-z])([A-Z])/g, "$1-$2")
-      .toLowerCase()
-      .replaceAll(/\"/g, "")
-      .replaceAll(",", ";")}`;
-  }, "");
+  const parsedStyles = new Map<string, Record<string, string>>();
+  for (const theme of themes) {
+    const parsedStyle: Record<string, string> = {};
+    if (theme.style) {
+      const keys = Object.keys(theme.style);
+      for (const key of keys) {
+        const parsedKey = key
+          .replace(/([a-z])([A-Z])/gm, "$1-$2")
+          .toLowerCase();
+        parsedStyle[parsedKey] = theme.style[key as ThemeEntryStyleTypeKey];
+      }
+      parsedStyles.set(theme.name, parsedStyle);
+    }
+  }
+  let css = "";
+  for (const [key, value] of parsedStyles) {
+    css = css.concat(
+      `\n .theme-slide-${key} ${JSON.stringify(value)
+        .replaceAll(/\"/g, "")
+        .replaceAll(",", ";")} \n`
+    );
+  }
+  return css;
 };
 
 // TODO: Remove theme

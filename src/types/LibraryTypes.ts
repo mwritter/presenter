@@ -79,19 +79,21 @@ export enum PresenterMode {
 
 export type ThemeEntryType = {
   name: string;
-  style?: ThemeEntryStyleType;
+  style?: Record<ThemeEntryStyleTypeKey, string>;
   media?: {
     source: string;
   };
 };
 
 export type ThemeEntryStyleType = {
-  alignItems: CSSProperties["alignItems"];
-  justifyContent: CSSProperties["justifyContent"];
-  fontFamily: CSSProperties["fontFamily"];
-  fontSize: CSSProperties["fontSize"];
-  color: CSSProperties["color"];
-  display: CSSProperties["display"];
-  flexDirection: CSSProperties["flexDirection"];
-  whiteSpace: CSSProperties["whiteSpace"];
+  alignItems: string;
+  justifyContent: string;
+  fontFamily: string;
+  fontSize: string;
+  color: string;
+  display: string;
+  flexDirection: string;
+  whiteSpace: string;
 };
+
+export type ThemeEntryStyleTypeKey = keyof ThemeEntryStyleType;

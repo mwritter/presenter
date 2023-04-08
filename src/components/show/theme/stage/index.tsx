@@ -1,59 +1,52 @@
 import styled from "@emotion/styled";
-import { TauriEvent } from "@tauri-apps/api/event";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import useStore from "../../../../store";
-import { ThemeEntryStyleType } from "../../../../types/LibraryTypes";
+import useProjectorScale from "../../../../hooks/useProjectorScale";
+import TextSlide from "../../slide/TextSlide";
+import { useResizeDetector } from "react-resize-detector";
 
 const ThemeStageContainer = styled.div`
-  display: grid;
   grid-area: stage;
-  border: 1px solid black;
   width: 100%;
+  height: 100%;
+  display: grid;
+`;
+
+const ThemeStageBody = styled.div`
+  overflow: hidden;
 `;
 
 const ThemeStage = ({ selectedStyle }: ThemeStageProps) => {
-  const slideRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(0);
-  const [scale, setScale] = useState(0.1);
+  const { width: stageWidth, ref: stageRef } = useResizeDetector();
 
-  const { projector } = useStore(({ projector }) => ({
-    projector,
-  }));
-
-  // TODO: refactor this into hook
-  const scaleSlide = useCallback(
-    (projectorWidth: number, projectorHeight: number) => {
-      if (!slideRef.current) return;
-      const { clientWidth: width } = slideRef.current;
-      const quotient = projectorHeight / projectorWidth;
-      const newHeight = quotient * width;
-      setHeight(newHeight);
-      setScale((width / projectorWidth) * 2.2);
-    },
-    []
-  );
-
-  useEffect(() => {
-    projector?.outerSize().then(({ width, height }) => {
-      scaleSlide(width, height);
-    });
-    // For debugging
-    projector?.listen(TauriEvent.WINDOW_RESIZED, () => {
-      projector?.outerSize().then(({ width, height }) => {
-        scaleSlide(width, height);
-      });
-    });
-  }, []);
+  const { value, height, width, projectorWidth, projectorHeight } =
+    useProjectorScale({ width: stageWidth || 0 });
 
   return (
-    <ThemeStageContainer ref={slideRef} style={{ height, ...selectedStyle }}>
-      ThemeStage
+    <ThemeStageContainer ref={stageRef}>
+      <div style={{ height, overflow: "hidden", border: "1px solid black" }}>
+        <ThemeStageBody
+          style={{
+            ...selectedStyle,
+            height: projectorHeight,
+            width: projectorWidth,
+            transformOrigin: "left top",
+            transform: `scale(${value})`,
+          }}
+        >
+          <TextSlide
+            contentEditable={true}
+            slide={{
+              id: "theme-slide",
+              text: `Text`,
+            }}
+          />
+        </ThemeStageBody>
+      </div>
     </ThemeStageContainer>
   );
 };
 
 interface ThemeStageProps {
-  selectedStyle: ThemeEntryStyleType;
+  selectedStyle: Record<string, string>;
 }
 
 export default ThemeStage;

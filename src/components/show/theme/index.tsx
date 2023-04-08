@@ -7,17 +7,24 @@ import {
   buildCSS,
   editThemeEntry,
 } from "../../../helpers/theme.helper";
-import ThemeFontEditSection from "../../toolbar/font";
+import ThemeFontEditSection from "./toolbar/font";
 import ThemeStage from "./stage";
 import useStore from "../../../store";
-import { ThemeEntryStyleType } from "../../../types/LibraryTypes";
+import {
+  ThemeEntryStyleType,
+  ThemeEntryStyleTypeKey,
+  ThemeEntryType,
+} from "../../../types/LibraryTypes";
+import ThemeControls from "./controls";
 
 const ThemeEditorContainer = styled.div`
   display: grid;
-  grid-template: "stage toolbar";
+  grid-template:
+    "controls toolbar"
+    "stage toolbar";
   grid-template-columns: 1fr 250px;
+  grid-template-rows: auto 1fr;
   height: 100vh;
-  padding: 1rem;
   gap: 1rem;
 `;
 
@@ -25,23 +32,24 @@ const ThemeToolbar = styled.div`
   grid-area: toolbar;
   display: flex;
   flex-direction: column;
-  padding: 1rem 0;
+  background-color: #21212a;
+  padding: 1rem;
 `;
 
 const DEFAULT_VALUES = {
   fontFamily: "Arial",
-  fontSize: 15,
+  fontSize: "15",
   justifyContent: "start",
   alignItems: "start",
   color: "white",
   display: "flex",
   flexDirection: "column",
   whiteSpace: "nowrap",
-} as ThemeEntryStyleType;
+};
 
 const ThemeEditor = () => {
   const [selectedStyle, setSelectedStyle] =
-    useState<ThemeEntryStyleType>(DEFAULT_VALUES);
+    useState<Record<ThemeEntryStyleTypeKey, string>>(DEFAULT_VALUES);
 
   const { theme, setTheme } = useStore(({ theme, setTheme }) => ({
     theme,
@@ -49,33 +57,30 @@ const ThemeEditor = () => {
   }));
 
   const onFontFamilySelectChange = useCallback(
-    (fontFamily: CSSProperties["fontFamily"]) =>
-      setSelectedStyle((cur) => ({ ...cur, fontFamily })),
-    []
-  );
-
-  const onHorizontalAlignmentChange = useCallback(
-    (justifyContent: CSSProperties["justifyContent"]) =>
-      setSelectedStyle((cur) => ({ ...cur, justifyContent })),
+    (fontFamily: string) => setSelectedStyle((cur) => ({ ...cur, fontFamily })),
     []
   );
 
   const onVerticalAlignmentChange = useCallback(
-    (alignItems: CSSProperties["alignItems"]) => {
-      console.log("here");
-      setSelectedStyle((cur) => ({ ...cur, alignItems }));
-    },
+    (justifyContent: string) =>
+      setSelectedStyle((cur) => ({ ...cur, justifyContent })),
     []
   );
 
+  const onHorizontalAlignmentChange = useCallback((alignItems: string) => {
+    setSelectedStyle((cur) => ({ ...cur, alignItems }));
+  }, []);
+
   const onFontSizeChange = useCallback(
-    (fontSize: CSSProperties["fontSize"]) =>
-      setSelectedStyle((cur) => ({ ...cur, fontSize: `${fontSize}px` })),
+    (fontSize: string) =>
+      setSelectedStyle((cur) => ({
+        ...cur,
+        fontSize: `${Number(fontSize) || 0}px`,
+      })),
     []
   );
 
   useEffect(() => {
-    console.log(theme?.style);
     if (theme?.style) {
       setSelectedStyle(theme.style);
     }
@@ -83,6 +88,7 @@ const ThemeEditor = () => {
 
   return (
     <ThemeEditorContainer>
+      <ThemeControls theme={theme} selectedStyle={selectedStyle} />
       <ThemeStage selectedStyle={selectedStyle} />
       <ThemeToolbar>
         <ThemeFontEditSection
@@ -93,15 +99,6 @@ const ThemeEditor = () => {
           onFontSizeChange={onFontSizeChange}
         />
       </ThemeToolbar>
-      <Button
-        onClick={() => {
-          if (theme) {
-            editThemeEntry(theme.name, selectedStyle);
-          }
-        }}
-      >
-        Save it
-      </Button>
     </ThemeEditorContainer>
   );
 };

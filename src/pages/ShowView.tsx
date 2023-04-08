@@ -14,6 +14,7 @@ const ShowViewContainer = styled.section`
   width: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
+  margin-top: 1rem;
 `;
 
 const ShowView = () => {
@@ -44,11 +45,9 @@ const ShowView = () => {
       <Box hidden={mode !== PresenterMode.MEDIA}>
         <MediaShowView />
       </Box>
-      {mode === PresenterMode.THEME && (
-        <Box>
-          <ThemeEditor />
-        </Box>
-      )}
+      <Box hidden={mode !== PresenterMode.THEME}>
+        <ThemeEditor />
+      </Box>
     </ShowViewContainer>
   );
 };

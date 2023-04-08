@@ -3,36 +3,61 @@ import { WebviewWindow, availableMonitors } from "@tauri-apps/api/window";
 import ShowView from "./ShowView";
 import useStore from "../store";
 import { useEffect } from "react";
-import Toolbar from "../components/toolbar";
+import { listen, emit } from "@tauri-apps/api/event";
 
-import { fontDir } from "@tauri-apps/api/path";
-import { readDir } from "@tauri-apps/api/fs";
-import { convertFileSrc } from "@tauri-apps/api/tauri";
-const getFontsDir = async () => await fontDir();
+const listenForProjectorSize = async () => {
+  console.log("listening to projector-size");
+  await listen<{ width: number; height: number }>(
+    "projector-size",
+    async ({ payload: { width, height } }) => {
+      console.log("heard projector-size", width, height);
+      const projector = useStore.getState().projector;
+      console.log(projector);
+      if (projector) {
+        useStore.getState().setProjector({ ...projector, height, width });
+      }
+    }
+  );
+};
 
-const setProjectorMonitor = async () => {
+const setWindowMonitors = async () => {
   const monitors = await availableMonitors();
-  let [monitor] = monitors;
-  if (monitors.length > 1) {
-    [, monitor] = monitors;
-  }
+  const [primary, secondary, tertiary] = monitors;
+  const projectorMonitor = secondary;
+  const promptMonitor = tertiary || primary;
   const projectorWindow = new WebviewWindow("projector", {
     url: "/projector",
     title: "projector",
     // fullscreen: true,
   });
 
+  const promptWindow = new WebviewWindow("prompt", {
+    url: "/prompt",
+    title: "prompt",
+    // fullscreen: true,
+  });
+
   projectorWindow.once("tauri://created", () => {
-    useStore.getState().setProjector(projectorWindow);
-    projectorWindow.setPosition(monitor.position);
+    useStore
+      .getState()
+      .setProjector({ webview: projectorWindow, height: 1, width: 1 });
+    projectorWindow.setPosition(projectorMonitor.position);
+    projectorWindow.setFullscreen(true);
+  });
+
+  promptWindow.once("tauri://created", () => {
+    useStore.getState().setPrompt(promptWindow);
+    promptWindow.setPosition(promptMonitor.position);
   });
 };
 
 // TODO: when main view is closed or reloaded we need to close / reload
 // the projector as well
 const Presenter = () => {
+  const projector = useStore(({ projector }) => projector);
   useEffect(() => {
-    setProjectorMonitor();
+    const unlisten = listenForProjectorSize();
+    setWindowMonitors();
   }, []);
 
   return (

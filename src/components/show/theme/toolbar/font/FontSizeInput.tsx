@@ -20,21 +20,21 @@ const FontSizeInputStyled = styled(NumberInput)`
   }
 `;
 
-const FontSizeInput = ({ value = 15, onChange }: FontSizeInputProps) => {
+const FontSizeInput = ({ value = "15", onChange }: FontSizeInputProps) => {
   return (
     <FontSizeInputStyled
       label="Size"
       min={0}
       max={200}
       value={parseInt(value?.toString())}
-      onChange={onChange}
+      onChange={(value) => onChange(value.toString())}
     />
   );
 };
 
 interface FontSizeInputProps {
   value: CSSProperties["fontSize"];
-  onChange: (value: number) => void;
+  onChange: (value: string) => void;
 }
 
 export default FontSizeInput;

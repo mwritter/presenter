@@ -14,8 +14,6 @@ const ShowProjectorButton = () => {
         <ActionIcon
           variant="transparent"
           onClick={() => {
-            console.log("Closing");
-            projector.emit("say-hey");
             // projector.close().then(() => {
             //   setProjector(null);
             // });
@@ -38,12 +36,10 @@ const ShowProjectorButton = () => {
             });
 
             webview.once("tauri://created", () => {
-              console.log("Created");
               setProjector(webview);
             });
 
             webview.once(TauriEvent.WINDOW_CLOSE_REQUESTED, () => {
-              console.log("Closed");
               setProjector(null);
             });
           }}

@@ -1,11 +1,16 @@
 import styled from "@emotion/styled";
-import { Text } from "@mantine/core";
-import { listen } from "@tauri-apps/api/event";
-import { createRef, useEffect, useState } from "react";
-import ProjectorStyle from "../components/projector/ProjectorStyle";
-import { MediaEntryType, SlideEntryType } from "../types/LibraryTypes";
+import { TauriEvent, listen, emit } from "@tauri-apps/api/event";
+import {
+  ReactNode,
+  createRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { SlideEntryType } from "../types/LibraryTypes";
 import { appWindow } from "@tauri-apps/api/window";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, usePresence } from "framer-motion";
 import TextSlide from "../components/show/slide/TextSlide";
 
 const listenForSlideChanges = async (
@@ -23,6 +28,19 @@ const listenForThemeChanges = async (callBack: (theme: string) => void) => {
   await listen<string>("set-theme", async ({ payload }) => {
     callBack(payload);
   });
+};
+
+const listenForGetSize = async (callBack: () => void) => {
+  console.log("listening to get-size");
+  await listen<string>("get-size", async () => {
+    callBack();
+  });
+};
+
+const projectorHandle = (node: HTMLElement) => {
+  const { width, height } = node.getBoundingClientRect();
+  console.log("emitting projector-size");
+  emit("projector-size", { width, height });
 };
 
 const ProjectorContainer = styled.main`
@@ -56,7 +74,7 @@ const ProjectorImg = styled.img`
 
 const Projector = () => {
   const slideRef = createRef<HTMLDivElement>();
-  const containerRef = createRef<HTMLElement>();
+  const containerRef = useRef<HTMLElement>(null);
   const [slide, setSlide] = useState<
     (SlideEntryType & { theme: string }) | null
   >();
@@ -66,11 +84,24 @@ const Projector = () => {
     video: null,
   });
 
-  // TODO: going to need to trigger a re render when themes updates
+  const emitProjectorSize = useCallback(() => {
+    console.log("trying");
+    if (containerRef.current) {
+      const { width, height } = containerRef.current.getBoundingClientRect();
+      console.log("emitting projector-size");
+      emit("projector-size", { width, height });
+    }
+  }, []);
+
   useEffect(() => {
     // TODO: unlisten to these events on
     const unlisten = [
-      listenForSlideChanges(setSlide),
+      listenForGetSize(emitProjectorSize),
+      listenForSlideChanges((p) =>
+        setSlide(() => {
+          return p;
+        })
+      ),
       listenForThemeChanges(setTheme),
     ];
   }, []);
@@ -103,6 +134,8 @@ const Projector = () => {
     }
   }, [slide]);
 
+  useEffect(() => emitProjectorSize(), []);
+
   return (
     <>
       {slide ? (
@@ -117,34 +150,47 @@ const Projector = () => {
             style={{
               display: "flex",
               flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              textAlign: "center",
               backgroundColor: "black",
             }}
           >
-            <SlideBody className={`theme-slide-${theme}`} ref={slideRef}>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={slide.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slide.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                style={{ flex: 1 }}
+              >
+                <SlideBodyV2 className={`theme-slide-${theme}`}>
                   <TextSlide slide={slide} />
                   {media.img && <ProjectorImg src={media.img} />}
                   {media.video && <ProjectorVideo autoPlay src={media.video} />}
-                </motion.div>
-              </AnimatePresence>
-            </SlideBody>
+                </SlideBodyV2>
+              </motion.div>
+            </AnimatePresence>
           </SlideContainer>
         </ProjectorContainer>
       ) : (
-        <ProjectorContainer></ProjectorContainer>
+        <ProjectorContainer ref={containerRef}></ProjectorContainer>
       )}
     </>
   );
 };
 
 export default Projector;
+
+const SlideBodyV2 = ({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className: string;
+}) => {
+  const [isPresent, safeToRemove] = usePresence();
+  useEffect(() => {
+    if (!isPresent) safeToRemove();
+  }, [isPresent]);
+
+  return <SlideBody className={className}>{children}</SlideBody>;
+};

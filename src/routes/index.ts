@@ -13,6 +13,11 @@ export function RouterElement() {
       name: "Projector",
       element: lazyLoadRoutes("Projector"),
     },
+    {
+      path: "prompt",
+      name: "Prompt",
+      element: lazyLoadRoutes("Prompt"),
+    },
   ];
 
   return useRoutes(routes);

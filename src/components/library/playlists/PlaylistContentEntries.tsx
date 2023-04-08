@@ -28,7 +28,6 @@ const PlaylistItem = styled(Text)<TextProps>`
 `;
 
 const PlaylistContentEntries = ({ items }: PlaylistContentEntriesProps) => {
-  console.log(items);
   // return <DndListHandle data={items} />;
 };
 

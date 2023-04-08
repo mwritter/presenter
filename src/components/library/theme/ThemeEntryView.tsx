@@ -58,8 +58,13 @@ const ThemeEntryView = () => {
   );
 
   useEffect(() => {
-    getThemeEnties();
-  }, []);
+    getThemeEnties().then(() => {
+      if (!theme) {
+        const [firstTheme] = themes;
+        setTheme(firstTheme);
+      }
+    });
+  }, [theme]);
 
   return (
     <ThemeDirContainer>

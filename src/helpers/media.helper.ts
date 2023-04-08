@@ -140,8 +140,6 @@ export const createMediaFileThumbnail = async (sourceFilePath: string) => {
   const [fileName, ext] = sourceFilePath.split("/").pop()?.split(".") || [];
   const thumbnailFilePath = `${dir}media/assets/thumbnail/${media.id}/${fileName}.png`;
   if (["mp4", "mov"].includes(ext)) {
-    console.log("ffmpeg - video");
-
     const command = Command.sidecar("binaries/ffmpeg", [
       "-i",
       sourceFilePath,
@@ -156,7 +154,6 @@ export const createMediaFileThumbnail = async (sourceFilePath: string) => {
       console.log(output.stderr);
     }
   } else if (["png", "jpg", "jpeg"]) {
-    console.log("ffmpeg - image");
     const command = Command.sidecar("binaries/ffmpeg", [
       "-i",
       sourceFilePath,

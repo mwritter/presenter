@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { ActionIcon, Text, TextProps, Title } from "@mantine/core";
 import useStore from "../../../store";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   create,
   getMediaDirContents,
@@ -9,6 +9,7 @@ import {
 } from "../../../helpers/media.helper";
 import { IconPlus } from "@tabler/icons-react";
 import MediaAddInput from "./MediaAddInput";
+import { FileEntry } from "@tauri-apps/api/fs";
 
 const MediaDirContainer = styled.section``;
 
@@ -55,9 +56,15 @@ const MediaDirView = () => {
   );
   const [selected, setSelected] = useState<string>(media?.name || "");
   const [addInput, setAddInput] = useState(false);
-  useEffect(() => {
-    getMediaDirContents();
-  }, []);
+
+  const selectMediaEntry = useCallback(
+    async ({ path, name = "" }: FileEntry) => {
+      const mediaFileData = await getMediaFileData(path);
+      setMedia(mediaFileData);
+      setSelected(name);
+    },
+    []
+  );
 
   return (
     <MediaDirContainer>
@@ -79,19 +86,16 @@ const MediaDirView = () => {
           />
         )}
         {mediaFiles
-          .filter((f) => !/^\./.test(f?.name || ""))
-          .map((f) => {
-            return !f.children ? (
-              <div key={f.path}>
+          .filter((file) => !/^\./.test(file?.name || ""))
+          .map((file) => {
+            return !file.children ? (
+              <div key={file.path}>
                 <MediaEntry
-                  selected={selected === f.name}
-                  key={f.path}
-                  onClick={() => {
-                    getMediaFileData(f.path).then(setMedia);
-                    setSelected(f.path);
-                  }}
+                  selected={selected === file.name}
+                  key={file.path}
+                  onClick={() => selectMediaEntry(file)}
                 >
-                  {f.name?.split(".")[0]}
+                  {file.name?.split(".")[0]}
                 </MediaEntry>
               </div>
             ) : null;

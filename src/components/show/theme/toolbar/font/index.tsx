@@ -3,9 +3,7 @@ import { Title } from "@mantine/core";
 import FontAlignment from "./FontAlignment";
 import FontFamilySelect from "./FontFamilySelect";
 import FontSizeInput from "./FontSizeInput";
-import { CSSProperties, useCallback, useEffect, useState } from "react";
-import useStore from "../../../store";
-import { SelectedStyleType } from "../../show/theme";
+import { ThemeEntryStyleType } from "../../../../../types/LibraryTypes";
 
 const DEFAULT_VALUES = {
   fontFamily: "Arial",
@@ -33,8 +31,8 @@ const ThemeFontEditSection = ({
         FONT
       </Title>
       <FontAlignment
-        vertical={selectedStyle.alignItems}
-        horizontal={selectedStyle.justifyContent}
+        vertical={selectedStyle.justifyContent}
+        horizontal={selectedStyle.alignItems}
         onHorizontalAlignmentChange={onHorizontalAlignmentChange}
         onVerticalAlignmentChange={onVerticalAlignmentChange}
       />
@@ -51,11 +49,11 @@ const ThemeFontEditSection = ({
 };
 
 interface ThemeFontEditSectionProps {
-  selectedStyle: SelectedStyleType;
+  selectedStyle: ThemeEntryStyleType;
   onHorizontalAlignmentChange: (value: string) => void;
   onVerticalAlignmentChange: (value: string) => void;
   onFontFamilySelectChange: (value: string) => void;
-  onFontSizeChange: (value: number) => void;
+  onFontSizeChange: (value: string) => void;
 }
 
 export default ThemeFontEditSection;
