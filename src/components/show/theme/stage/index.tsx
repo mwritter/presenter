@@ -33,7 +33,6 @@ const ThemeStage = ({ selectedStyle }: ThemeStageProps) => {
           }}
         >
           <TextSlide
-            contentEditable={true}
             slide={{
               id: "theme-slide",
               text: `Text`,

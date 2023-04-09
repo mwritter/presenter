@@ -14,6 +14,7 @@ const SlideContainer = styled.div<SliderContainerProps>`
   border: 3px solid ${(p) => (p.active ? "#9DC08B" : "#ccc")};
   border-radius: 5px;
   cursor: pointer;
+  background-color: black;
 `;
 
 const SlideGroupIndicator = styled.div<SlideGroupIndicatorProps>`
@@ -32,7 +33,6 @@ const Slide = ({
 }: SlideProps) => {
   const [openedGroupMenu, setOpenedGroupMenu] = useState(false);
   const slideRef = useRef<HTMLDivElement>(null);
-  // TODO: Move this higher up
   const { value, height, width, projectorHeight, projectorWidth } =
     useProjectorScale({ width: 350 });
 
@@ -68,7 +68,6 @@ const Slide = ({
           <SlideGroupIndicatorMenu
             opened={openedGroupMenu}
             onChange={setOpenedGroupMenu}
-            // TODO: this needs to be dynamic to allow editing library files as well
             onGroupChange={onGroupChange}
           >
             <SlideGroupIndicator groupId={Groups[slide.group]} />

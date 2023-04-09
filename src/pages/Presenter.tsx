@@ -3,16 +3,13 @@ import { WebviewWindow, availableMonitors } from "@tauri-apps/api/window";
 import ShowView from "./ShowView";
 import useStore from "../store";
 import { useEffect } from "react";
-import { listen, emit } from "@tauri-apps/api/event";
+import { listen } from "@tauri-apps/api/event";
 
 const listenForProjectorSize = async () => {
-  console.log("listening to projector-size");
   await listen<{ width: number; height: number }>(
     "projector-size",
     async ({ payload: { width, height } }) => {
-      console.log("heard projector-size", width, height);
       const projector = useStore.getState().projector;
-      console.log(projector);
       if (projector) {
         useStore.getState().setProjector({ ...projector, height, width });
       }
@@ -28,7 +25,7 @@ const setWindowMonitors = async () => {
   const projectorWindow = new WebviewWindow("projector", {
     url: "/projector",
     title: "projector",
-    // fullscreen: true,
+    fullscreen: true,
   });
 
   const promptWindow = new WebviewWindow("prompt", {

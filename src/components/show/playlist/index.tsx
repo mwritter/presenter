@@ -1,13 +1,15 @@
 import styled from "@emotion/styled";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Stack } from "@mantine/core";
 import useStore from "../../../store";
 import PlaylistEditToolBar from "../../library/playlists/PlaylistEditToolBar";
 import PlaylistSectionToolBar from "../../library/playlists/PlaylistSectionToolBar";
 import Slide from "../slide/Slide";
 import { editPlaylistSlideData } from "../../../helpers/playlist.helper";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { emit } from "@tauri-apps/api/event";
+import { useHotkeys } from "@mantine/hooks";
+import { PlaylistEntryType, SlideEntryType } from "../../../types/LibraryTypes";
 
 const ShowViewGrid = styled.div`
   display: grid;
@@ -20,11 +22,64 @@ const ShowViewGrid = styled.div`
 `;
 
 const PlaylistShowView = () => {
-  const [activeSlideId, setActiveSlideId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [projector, show, playlist] = useStore(
-    ({ projector, playlist, show }) => [projector, show, playlist]
+  const [activeSlide, _setActiveSlide] = useState<{
+    slideId: string | null;
+    sectionId: string | null;
+  }>({ slideId: null, sectionId: null });
+  const [show, playlist] = useStore(({ playlist, show }) => [show, playlist]);
+
+  const setActiveSlide = useCallback(
+    (slide: SlideEntryType, section: PlaylistEntryType) => {
+      const currentIdx = section.slides.findIndex(({ id }) => id === slide.id);
+      _setActiveSlide({
+        slideId: slide.id,
+        sectionId: section.id,
+      });
+      emit("set-slide", {
+        ...slide,
+        theme: section.theme,
+        next: section?.slides[currentIdx + 1] || null,
+      });
+    },
+    []
   );
+
+  const moveToNextSlide = useCallback(() => {
+    if (!show || !activeSlide.slideId || !activeSlide.sectionId) return;
+    const { slideId, sectionId } = activeSlide;
+    const currentSection = show.content.find(({ id }) => id === sectionId);
+    const currentSlideIdx = currentSection?.slides.findIndex(
+      ({ id }) => id === slideId
+    );
+    if (!currentSection || currentSlideIdx === undefined || currentSlideIdx < 0)
+      return;
+
+    const nextSlide = currentSection.slides[currentSlideIdx + 1] || null;
+    setActiveSlide(nextSlide, currentSection);
+  }, [activeSlide, show]);
+
+  const moveToPreviousSlide = useCallback(() => {
+    if (!show || !activeSlide.slideId || !activeSlide.sectionId) return;
+    const { slideId, sectionId } = activeSlide;
+    const currentSection = show.content.find(({ id }) => id === sectionId);
+    const currentSlideIdx = currentSection?.slides.findIndex(
+      ({ id }) => id === slideId
+    );
+    if (
+      !currentSection ||
+      currentSlideIdx === undefined ||
+      currentSlideIdx <= 0
+    )
+      return;
+
+    const nextSlide = currentSection.slides[currentSlideIdx - 1] || null;
+    setActiveSlide(nextSlide, currentSection);
+  }, [activeSlide, show]);
+
+  useHotkeys([
+    ["ArrowRight", moveToNextSlide],
+    ["ArrowLeft", moveToPreviousSlide],
+  ]);
 
   return (
     <>
@@ -53,15 +108,10 @@ const PlaylistShowView = () => {
                       >
                         <Slide
                           theme={section?.theme}
-                          active={activeSlideId === section.id + idx}
+                          active={activeSlide.slideId === slide.id}
                           slide={slide}
                           onClick={() => {
-                            setActiveSlideId(section.id + idx);
-                            emit("set-slide", {
-                              ...slide,
-                              theme: section.theme,
-                              next: section?.slides[idx + 1] || null,
-                            });
+                            setActiveSlide(slide, section);
                           }}
                           onGroupChange={(group) => {
                             if (playlist) {

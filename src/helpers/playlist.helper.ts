@@ -172,6 +172,7 @@ export const create = async (name: string) => {
 export const addContent = async (name: string, libraryName: string) => {
   const playlist = await parsePlaylist(name);
   const content = await getLibraryFileDataForPlaylist(libraryName);
+  content.slides = content.slides.map((slide) => ({ ...slide, id: uuid() }));
   playlist.content = [...playlist.content, content];
   await write(name, playlist);
 };
