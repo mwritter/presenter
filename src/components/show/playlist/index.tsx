@@ -11,22 +11,31 @@ import { emit } from "@tauri-apps/api/event";
 import { useHotkeys } from "@mantine/hooks";
 import { PlaylistEntryType, SlideEntryType } from "../../../types/LibraryTypes";
 
-const ShowViewGrid = styled.div`
+const ShowViewGrid = styled.div<{ slideSize?: number }>`
   display: grid;
   max-width: 2000px;
   width: 100%;
-  grid-template-columns: repeat(auto-fill, 350px);
+  grid-template-columns: repeat(
+    auto-fill,
+    ${({ slideSize }) => (slideSize ? slideSize + "px" : "350px")}
+  );
   gap: 1rem;
   justify-content: center;
   align-self: center;
+  transition: all 1s;
 `;
 
-const PlaylistShowView = () => {
+const PlaylistShowView = ({ slideSize }: { slideSize: number }) => {
   const [activeSlide, _setActiveSlide] = useState<{
     slideId: string | null;
     sectionId: string | null;
   }>({ slideId: null, sectionId: null });
   const [show, playlist] = useStore(({ playlist, show }) => [show, playlist]);
+
+  const getSlideSize = useCallback(() => {
+    console.log(slideSize);
+    return slideSize * 0.01 * 1400;
+  }, [slideSize]);
 
   const setActiveSlide = useCallback(
     (slide: SlideEntryType, section: PlaylistEntryType) => {
@@ -97,7 +106,7 @@ const PlaylistShowView = () => {
                   playlistName={show.name}
                   section={section}
                 />
-                <ShowViewGrid>
+                <ShowViewGrid slideSize={getSlideSize()}>
                   {section?.slides?.map((slide, idx) => {
                     return (
                       <motion.div
@@ -107,6 +116,7 @@ const PlaylistShowView = () => {
                         transition={{ duration: 1, ease: "easeIn" }}
                       >
                         <Slide
+                          size={getSlideSize()}
                           theme={section?.theme}
                           active={activeSlide.slideId === slide.id}
                           slide={slide}

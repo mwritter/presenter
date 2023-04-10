@@ -6,6 +6,7 @@ import { ThemeEntryType } from "../../../../types/LibraryTypes";
 
 const ThemeControlsStyled = styled.div`
   grid-area: controls;
+  margin-top: 1rem;
 `;
 
 const ThemeControls = ({ theme, selectedStyle }: ThemeControlsProps) => {

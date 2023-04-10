@@ -1,20 +1,10 @@
 import styled from "@emotion/styled";
-import { Button } from "@mantine/core";
-import { BaseDirectory, readTextFile } from "@tauri-apps/api/fs";
-import { CSSProperties, useCallback, useEffect, useState } from "react";
-import {
-  addThemeEntry,
-  buildCSS,
-  editThemeEntry,
-} from "../../../helpers/theme.helper";
+import { useCallback, useEffect, useState } from "react";
+
 import ThemeFontEditSection from "./toolbar/font";
 import ThemeStage from "./stage";
 import useStore from "../../../store";
-import {
-  ThemeEntryStyleType,
-  ThemeEntryStyleTypeKey,
-  ThemeEntryType,
-} from "../../../types/LibraryTypes";
+import { ThemeEntryStyleTypeKey } from "../../../types/LibraryTypes";
 import ThemeControls from "./controls";
 
 const ThemeEditorContainer = styled.div`
@@ -26,6 +16,7 @@ const ThemeEditorContainer = styled.div`
   grid-template-rows: auto 1fr;
   height: 100vh;
   gap: 1rem;
+  margin-left: 1rem;
 `;
 
 const ThemeToolbar = styled.div`

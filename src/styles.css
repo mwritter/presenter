@@ -14,14 +14,10 @@ body,
 
 #Presenter {
   display: grid;
-  grid-template-areas:
-    "toolbar toolbar"
-    "library show";
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-areas: "actionmenu library show";
+  grid-template-columns: auto auto 1fr;
   background-color: #282c34;
   height: 100%;
-  column-gap: 1rem;
 }
 
 /* Scrollbar styles */
@@ -41,4 +37,13 @@ body,
 
 .no-scroll-bar ::-webkit-scrollbar {
   width: 0;
+}
+
+.theme-slide-message {
+  position: absolute;
+  bottom: 10%;
+  left: 10%;
+  font-size: 48px;
+  padding: 0.5rem;
+  border-radius: 5px;
 }

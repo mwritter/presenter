@@ -48,7 +48,9 @@ export const getMediaDirContents = async () => {
     dir: BaseDirectory.AppData,
     recursive: true,
   });
-  useStore.getState().setMediaFiles(content);
+  useStore
+    .getState()
+    .setMediaFiles(content.filter(({ name = "" }) => !/^\./.test(name)));
 };
 
 export const createMediaDir = async () => {

@@ -66,6 +66,16 @@ const MediaDirView = () => {
     []
   );
 
+  useEffect(() => {
+    getMediaDirContents();
+  }, []);
+
+  useEffect(() => {
+    if (!media && mediaFiles.length > 0) {
+      selectMediaEntry(mediaFiles[0]);
+    }
+  }, [mediaFiles]);
+
   return (
     <MediaDirContainer>
       <MediaHeaderContainer>

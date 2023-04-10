@@ -69,7 +69,7 @@ const ThemeEntryView = () => {
   return (
     <ThemeDirContainer>
       <ThemeHeaderContainer>
-        <ThemeDirTitle order={6}>MEDIA</ThemeDirTitle>
+        <ThemeDirTitle order={6}>THEME</ThemeDirTitle>
         <ActionIcon onClick={() => setAddInput(true)}>
           <IconPlus size={16} />
         </ActionIcon>

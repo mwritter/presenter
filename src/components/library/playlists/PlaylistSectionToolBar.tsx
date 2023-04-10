@@ -36,7 +36,7 @@ const PlaylistSectionToolBar = ({
       <PlaylistChangeThemeMenu
         onHandleThemeChange={(theme) =>
           editPlaylistSection({ theme }, section).then(() => {
-            projector?.emit("set-theme", theme);
+            projector?.webview?.emit("set-theme", theme);
           })
         }
       />

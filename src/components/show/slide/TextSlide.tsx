@@ -1,11 +1,11 @@
 import { Text } from "@mantine/core";
 import { SlideEntryType } from "../../../types/LibraryTypes";
 
-const TextSlide = ({ slide, contentEditable = false }: TextSlideProps) => {
+const TextSlide = ({ slide }: TextSlideProps) => {
   return (
     <>
       {slide.text?.split("\n").map((text, idx) => (
-        <Text contentEditable={contentEditable} unstyled key={idx}>
+        <Text unstyled key={idx}>
           {text}
         </Text>
       ))}
@@ -15,7 +15,6 @@ const TextSlide = ({ slide, contentEditable = false }: TextSlideProps) => {
 
 interface TextSlideProps {
   slide: SlideEntryType;
-  contentEditable?: boolean;
 }
 
 export default TextSlide;

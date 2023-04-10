@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { CSSProperties, useRef, useState } from "react";
 import styled from "@emotion/styled";
 import { Groups, GroupType } from "../helpers/slide.helper";
 import SlideGroupIndicatorMenu from "./SlideGroupIndicatorMenu";
@@ -11,7 +11,7 @@ interface SliderContainerProps {
 }
 
 const SlideContainer = styled.div<SliderContainerProps>`
-  border: 3px solid ${(p) => (p.active ? "#9DC08B" : "#ccc")};
+  border: 3px solid ${(p) => (p.active ? "#d7be62" : "#ccc")};
   border-radius: 5px;
   cursor: pointer;
   background-color: black;
@@ -27,14 +27,16 @@ const SlideGroupIndicator = styled.div<SlideGroupIndicatorProps>`
 const Slide = ({
   slide,
   theme,
-  active,
+  active = false,
   onClick,
   onGroupChange,
+  size,
+  style = {},
 }: SlideProps) => {
   const [openedGroupMenu, setOpenedGroupMenu] = useState(false);
   const slideRef = useRef<HTMLDivElement>(null);
   const { value, height, width, projectorHeight, projectorWidth } =
-    useProjectorScale({ width: 350 });
+    useProjectorScale({ width: size || 350 });
 
   return (
     <>
@@ -50,7 +52,7 @@ const Slide = ({
       >
         {slide.media?.thumbnail ? (
           <MediaSlide slide={slide} />
-        ) : (
+        ) : slide.id === "message-preview" ? (
           <div
             ref={slideRef}
             style={{
@@ -59,12 +61,27 @@ const Slide = ({
               transformOrigin: "left top",
               transform: `scale(${value})`,
             }}
+          >
+            <span className="theme-slide-message" style={style || {}}>
+              <TextSlide slide={slide} />
+            </span>
+          </div>
+        ) : (
+          <div
+            ref={slideRef}
+            style={{
+              height: projectorHeight,
+              width: projectorWidth,
+              transformOrigin: "left top",
+              transform: `scale(${value})`,
+              ...style,
+            }}
             className={theme ? `theme-slide-${theme}` : ""}
           >
             <TextSlide slide={slide} />
           </div>
         )}
-        {slide.group && (
+        {slide.group && onGroupChange && (
           <SlideGroupIndicatorMenu
             opened={openedGroupMenu}
             onChange={setOpenedGroupMenu}
@@ -81,9 +98,11 @@ const Slide = ({
 interface SlideProps {
   slide: SlideEntryType;
   theme?: string;
-  active: boolean;
-  onClick: () => void;
-  onGroupChange: (group: GroupType) => void;
+  active?: boolean;
+  onClick?: () => void;
+  onGroupChange?: (group: GroupType) => void;
+  size?: number;
+  style?: CSSProperties | null;
 }
 
 interface SlideGroupIndicatorProps {

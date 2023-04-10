@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Box } from "@mantine/core";
+import { Box, Slider, SliderProps } from "@mantine/core";
 import { useEffect, useState } from "react";
 import useStore from "../store";
 import { PresenterMode } from "../types/LibraryTypes";
@@ -14,10 +14,22 @@ const ShowViewContainer = styled.section`
   width: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
-  margin-top: 1rem;
+`;
+
+const ShowViewControls = styled.div`
+  position: fixed;
+  bottom: 0;
+  background-color: #21212a;
+  width: 100%;
+`;
+
+const GridItemSizeControl = styled(Slider)<SliderProps>`
+  width: 200px;
 `;
 
 const ShowView = () => {
+  const [gridItemSize, setGridItemSize] = useState<number>(0);
+  const [sliderValue, setSliderValue] = useState<number>(0);
   const [mode, show, playlist, setShow, library] = useStore(
     ({ mode, playlist, show, setShow, library }) => [
       mode,
@@ -37,7 +49,16 @@ const ShowView = () => {
   return (
     <ShowViewContainer>
       <Box hidden={mode !== PresenterMode.PLAYLIST}>
-        <PlaylistShowView />
+        <PlaylistShowView slideSize={gridItemSize} />
+        <ShowViewControls>
+          <GridItemSizeControl
+            defaultValue={25}
+            min={25}
+            value={sliderValue}
+            onChange={setSliderValue}
+            onChangeEnd={setGridItemSize}
+          />
+        </ShowViewControls>
       </Box>
       <Box hidden={mode !== PresenterMode.LIBRARY}>
         <LibraryShowView />
