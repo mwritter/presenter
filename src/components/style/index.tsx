@@ -14,6 +14,7 @@ const SlideThemeStyles = () => {
   const themes = useStore(({ themes }) => themes);
 
   useEffect(() => {
+    getThemeEnties();
     const unlisten = listenForStyleChange(setCSS);
   }, []);
 
@@ -23,8 +24,6 @@ const SlideThemeStyles = () => {
   useEffect(() => {
     if (themes) {
       emit("set-styles", buildCSS(themes));
-    } else {
-      getThemeEnties();
     }
   }, [themes]);
 

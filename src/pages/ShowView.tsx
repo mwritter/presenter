@@ -7,13 +7,12 @@ import PlaylistShowView from "../components/show/playlist";
 import LibraryShowView from "../components/show/library";
 import MediaShowView from "../components/show/media";
 import ThemeEditor from "../components/show/theme";
+import SearchView from "../components/search";
 
 const ShowViewContainer = styled.section`
-  position: relative;
-  grid-area: show;
+  grid-area: main;
   width: 100%;
   overflow-y: scroll;
-  overflow-x: hidden;
 `;
 
 const ShowViewControls = styled.div`
@@ -54,9 +53,8 @@ const ShowView = () => {
           <GridItemSizeControl
             defaultValue={25}
             min={25}
-            value={sliderValue}
-            onChange={setSliderValue}
-            onChangeEnd={setGridItemSize}
+            value={gridItemSize}
+            onChange={setGridItemSize}
           />
         </ShowViewControls>
       </Box>
@@ -68,6 +66,9 @@ const ShowView = () => {
       </Box>
       <Box hidden={mode !== PresenterMode.THEME}>
         <ThemeEditor />
+      </Box>
+      <Box hidden={mode !== PresenterMode.SEARCH}>
+        <SearchView />
       </Box>
     </ShowViewContainer>
   );

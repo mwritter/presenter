@@ -4,6 +4,7 @@ import {
   IconFolder,
   IconPhoto,
   IconPlayerPlay,
+  IconSearch,
   IconSquare,
 } from "@tabler/icons-react";
 import useStore from "../../store";
@@ -70,6 +71,14 @@ const LibraryViewNav = () => {
           label: (
             <Center>
               <IconSquare size={14} />
+            </Center>
+          ),
+        },
+        {
+          value: PresenterMode.SEARCH.toString(),
+          label: (
+            <Center>
+              <IconSearch size={14} />
             </Center>
           ),
         },

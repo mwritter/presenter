@@ -19,12 +19,18 @@
       },
       "shell": {
         "all": false,
+        "execute": true,
         "open": true,
         "sidecar": true,
         "scope": [
           {
             "name": "binaries/ffmpeg",
             "sidecar": true,
+            "args": true
+          },
+          {
+            "name": "get-env-variable",
+            "cmd": "printenv",
             "args": true
           }
         ]

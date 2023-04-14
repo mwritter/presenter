@@ -75,6 +75,7 @@ export enum PresenterMode {
   LIBRARY,
   MEDIA,
   THEME,
+  SEARCH,
 }
 
 export type ThemeEntryType = {
@@ -97,3 +98,21 @@ export type ThemeEntryStyleType = {
 };
 
 export type ThemeEntryStyleTypeKey = keyof ThemeEntryStyleType;
+
+export type SearchEntryType = {
+  directory: string;
+  fields: SearchEntryField[];
+  extractor: {
+    path: string;
+    key: string;
+    type: "string" | "number" | "array";
+  };
+};
+
+export type SearchEntryField = {
+  name: string;
+  type: string;
+  variables: string[];
+  delimiters: string[];
+  data: string[];
+};

@@ -7,7 +7,6 @@ import { useState } from "react";
 
 const ShowViewGrid = styled.div`
   display: grid;
-  max-width: 2000px;
   width: 100%;
   grid-template-columns: repeat(auto-fill, 350px);
   gap: 1rem;

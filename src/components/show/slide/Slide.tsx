@@ -76,7 +76,7 @@ const Slide = ({
               transform: `scale(${value})`,
               ...style,
             }}
-            className={theme ? `theme-slide-${theme}` : ""}
+            className={theme ? `theme-slide-${theme}` : "theme-slide-default"}
           >
             <TextSlide slide={slide} />
           </div>

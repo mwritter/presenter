@@ -14,7 +14,7 @@ body,
 
 #Presenter {
   display: grid;
-  grid-template-areas: "actionmenu library show";
+  grid-template-areas: "actionmenu library main";
   grid-template-columns: auto auto 1fr;
   background-color: #282c34;
   height: 100%;

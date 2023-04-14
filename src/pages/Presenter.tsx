@@ -7,6 +7,8 @@ import { listen } from "@tauri-apps/api/event";
 import IconNav from "../components/icon-nav";
 import UtilityView from "../components/utility";
 import { Box } from "@mantine/core";
+import PluginView from "../components/plugin";
+import SearchView from "../components/search";
 
 const listenForProjectorSize = async () => {
   await listen<{ width: number; height: number }>(
@@ -54,10 +56,11 @@ const setWindowMonitors = async () => {
 // TODO: when main view is closed or reloaded we need to close / reload
 // the projector as well
 const Presenter = () => {
-  const [view, setView] = useState<string>("slide");
+  const [utilityDrawer, setUtilityDrawer] = useState<string>("");
+  const [view, setView] = useState<string>("show");
 
   const onIconNavChange = useCallback((value: string) => {
-    setView(value);
+    setUtilityDrawer(value);
   }, []);
 
   useEffect(() => {
@@ -69,7 +72,7 @@ const Presenter = () => {
     <div id="Presenter">
       <LibraryView />
       <ShowView />
-      <IconNav onChange={onIconNavChange} view={view} />
+      <IconNav onChange={onIconNavChange} view={utilityDrawer} />
     </div>
   );
 };

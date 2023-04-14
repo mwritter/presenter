@@ -13,7 +13,6 @@ import { PlaylistEntryType, SlideEntryType } from "../../../types/LibraryTypes";
 
 const ShowViewGrid = styled.div<{ slideSize?: number }>`
   display: grid;
-  max-width: 2000px;
   width: 100%;
   grid-template-columns: repeat(
     auto-fill,
@@ -22,7 +21,6 @@ const ShowViewGrid = styled.div<{ slideSize?: number }>`
   gap: 1rem;
   justify-content: center;
   align-self: center;
-  transition: all 1s;
 `;
 
 const PlaylistShowView = ({ slideSize }: { slideSize: number }) => {

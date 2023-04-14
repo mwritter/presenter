@@ -6,6 +6,7 @@ import LibraryViewNav from "./LibraryViewNav";
 import MediaDirView from "./media/MediaDirView";
 import PlaylistDirView from "./playlists/PlaylistDirView";
 import ThemeEntryView from "./theme/ThemeEntryView";
+import SearchEntryView from "./search/SearchEntryView";
 
 const LibraryViewContainer = styled.div`
   grid-area: library;
@@ -35,6 +36,7 @@ const LibraryView = () => {
       {mode === PresenterMode.LIBRARY && <LibraryDirView />}
       {mode === PresenterMode.MEDIA && <MediaDirView />}
       {mode === PresenterMode.THEME && <ThemeEntryView />}
+      {mode === PresenterMode.SEARCH && <SearchEntryView />}
       <LibraryViewNav />
     </LibraryViewContainer>
   );
