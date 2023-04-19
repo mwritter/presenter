@@ -16,6 +16,7 @@ import {
   SlideEntryType,
 } from "../types/LibraryTypes";
 import { getLibraryFileDataForPlaylist } from "./library.helper";
+import { Groups } from "../components/show/helpers/slide.helper";
 
 export const getPlaylistsDirContents = async () => {
   const hasPlaylist = await exists("playlists", { dir: BaseDirectory.AppData });
@@ -197,6 +198,27 @@ export const addMediaContent = async (
     ];
     await write(name, playlist);
   }
+};
+
+export const addSearchContent = async (
+  playlistName: string,
+  { name, content }: { name: string; content: string[] }
+) => {
+  const playlist = await parsePlaylist(playlistName);
+  playlist.content = [
+    ...playlist.content,
+    {
+      id: uuid(),
+      name,
+      slides: content.map((text) => ({
+        id: uuid(),
+        text,
+        group: "NONE",
+      })),
+      theme: "default",
+    },
+  ];
+  await write(playlistName, playlist);
 };
 // {
 //   "name": "Graphics",

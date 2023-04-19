@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { TauriEvent, listen, emit } from "@tauri-apps/api/event";
+import { listen, emit } from "@tauri-apps/api/event";
 import {
   CSSProperties,
   ReactNode,
@@ -8,11 +8,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { SlideEntryType } from "../types/LibraryTypes";
+import { SlideEntryType, ThemeEntryType } from "../types/LibraryTypes";
 import { appWindow } from "@tauri-apps/api/window";
 import { motion, AnimatePresence, usePresence } from "framer-motion";
 import TextSlide from "../components/show/slide/TextSlide";
 import { Text } from "@mantine/core";
+import useStore from "../store";
 
 const listenForSlideChanges = async (
   callBack: (slide: SlideEntryType & { theme: string }) => void
@@ -23,6 +24,14 @@ const listenForSlideChanges = async (
       callBack(payload);
     }
   );
+};
+
+const listenForThemesChange = async (
+  callBack: (theme: ThemeEntryType[]) => void
+) => {
+  await listen<ThemeEntryType[]>("set-themes", async ({ payload }) => {
+    callBack(payload);
+  });
 };
 
 const listenForThemeChanges = async (callBack: (theme: string) => void) => {
@@ -81,6 +90,7 @@ const MessageContainer = styled.div`
 
 const Projector = () => {
   const containerRef = useRef<HTMLElement>(null);
+  const setThemes = useStore(({ setThemes }) => setThemes);
   const [slide, setSlide] = useState<
     (SlideEntryType & { theme: string }) | null
   >();
@@ -105,6 +115,7 @@ const Projector = () => {
   useEffect(() => {
     // TODO: unlisten to these events on
     const unlisten = [
+      listenForThemesChange(setThemes),
       listenForMessageToggle(setMessage),
       listenForGetSize(emitProjectorSize),
       listenForSlideChanges((p) =>
@@ -115,7 +126,7 @@ const Projector = () => {
       listenForThemeChanges(setTheme),
     ];
   }, []);
-
+  // TODO: update theme when container style changes as well
   useEffect(() => {
     if (slide && slide.theme && slide.theme !== theme) {
       appWindow.emit("set-theme", slide.theme);
@@ -160,7 +171,7 @@ const Projector = () => {
               style={{ flex: 1 }}
             >
               <SlideBody className={`theme-slide-${theme}`}>
-                {slide && <TextSlide slide={slide} />}
+                {slide && <TextSlide themeName={slide.theme} slide={slide} />}
                 {media.img && <ProjectorImg src={media.img} />}
                 {media.video && <ProjectorVideo autoPlay src={media.video} />}
               </SlideBody>

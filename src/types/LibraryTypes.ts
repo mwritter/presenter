@@ -84,6 +84,7 @@ export type ThemeEntryType = {
   media?: {
     source: string;
   };
+  container: ThemeEntryContainerType;
 };
 
 export type ThemeEntryStyleType = {
@@ -95,24 +96,53 @@ export type ThemeEntryStyleType = {
   display: string;
   flexDirection: string;
   whiteSpace: string;
+  backgroundImage: string;
+  backgroundSize: string;
+  backgroundRepeat: string;
+  backgroundPosition: string;
+};
+
+export type ThemeEntryContainerType = {
+  height: string;
+  width: string;
+  top: string;
+  left: string;
+  alignContent: string;
+  justifyContent: string;
+  display: string;
 };
 
 export type ThemeEntryStyleTypeKey = keyof ThemeEntryStyleType;
+export type ThemeEntryContainerTypeKey = keyof ThemeEntryContainerType;
 
 export type SearchEntryType = {
   directory: string;
+  identifier: string;
   fields: SearchEntryField[];
   extractor: {
     path: string;
     key: string;
     type: "string" | "number" | "array";
+    url?: string;
+    headers?: string;
   };
+  validator: Record<string, SearchValidator>;
 };
 
 export type SearchEntryField = {
   name: string;
   type: string;
   variables: string[];
-  delimiters: string[];
-  data: string[];
+  delimiters?: string[];
+  data?: string[];
+};
+
+export type SearchValidator = {
+  value?: string[];
+  pattern?: string;
+  type?: string;
+  path?: string;
+  required?: boolean;
+  minLength?: number;
+  identifier?: string;
 };

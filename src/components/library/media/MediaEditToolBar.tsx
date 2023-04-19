@@ -8,7 +8,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { IconEdit } from "@tabler/icons-react";
+import { IconEdit, IconPhotoPlus } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { renameMedia } from "../../../helpers/media.helper";
 import { addMediaContent } from "../../../helpers/playlist.helper";
@@ -107,7 +107,13 @@ const MediaEditToolBar = ({
           </ActionIcon>
         </List.Item>
         <List.Item>
-          <MediaFileInput />
+          <MediaFileInput
+            target={
+              <ActionIcon variant="transparent">
+                <IconPhotoPlus size={16} />
+              </ActionIcon>
+            }
+          />
         </List.Item>
         <List.Item>
           <MediaAddPlaylistMenu

@@ -50,6 +50,7 @@ const Slide = ({
         active={active}
         onClick={onClick}
       >
+        {/* TODO figure out media slide with text */}
         {slide.media?.thumbnail ? (
           <MediaSlide slide={slide} />
         ) : slide.id === "message-preview" ? (
@@ -63,7 +64,7 @@ const Slide = ({
             }}
           >
             <span className="theme-slide-message" style={style || {}}>
-              <TextSlide slide={slide} />
+              <TextSlide themeName={theme} slide={slide} />
             </span>
           </div>
         ) : (
@@ -78,7 +79,7 @@ const Slide = ({
             }}
             className={theme ? `theme-slide-${theme}` : "theme-slide-default"}
           >
-            <TextSlide slide={slide} />
+            <TextSlide themeName={theme} slide={slide} />
           </div>
         )}
         {slide.group && onGroupChange && (

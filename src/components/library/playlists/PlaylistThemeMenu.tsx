@@ -7,11 +7,6 @@ import { useEffect, useState } from "react";
 import { editAllPlaylistSlideData } from "../../../helpers/playlist.helper";
 import { getThemeEnties } from "../../../helpers/theme.helper";
 import useStore from "../../../store";
-import {
-  PlaylistEntryType,
-  PlaylistType,
-  SlideEntryType,
-} from "../../../types/LibraryTypes";
 
 const ThemeMenuDropdown = styled(Menu.Dropdown)`
   background-color: #21212a;

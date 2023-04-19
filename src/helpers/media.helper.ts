@@ -50,7 +50,11 @@ export const getMediaDirContents = async () => {
   });
   useStore
     .getState()
-    .setMediaFiles(content.filter(({ name = "" }) => !/^\./.test(name)));
+    .setMediaFiles(
+      content.filter(
+        ({ name = "", children }) => !/^\./.test(name) && !children?.length
+      )
+    );
 };
 
 export const createMediaDir = async () => {
@@ -66,7 +70,9 @@ export const createMediaDir = async () => {
 };
 
 export const getMediaFileData = async (path: string): Promise<MediaType> => {
-  const content = await readTextFile(path);
+  const content = await readTextFile(`media/${path}`, {
+    dir: BaseDirectory.AppData,
+  });
   const parsed = JSON.parse(content);
   parsed.path = path;
   return parsed;
@@ -86,9 +92,10 @@ export const getMediaSource = async (source: string) => {
 
 export const addMediaEntryFile = async (
   mediaFileName: string,
-  content: MediaEntryType
+  content: MediaEntryType,
+  options?: { media: MediaType }
 ) => {
-  const media = useStore.getState().media;
+  const media = options?.media || useStore.getState().media;
 
   const fileExists = await exists(`media/${mediaFileName}`, {
     dir: BaseDirectory.AppData,
@@ -103,15 +110,35 @@ export const addMediaEntryFile = async (
   }
 
   await getMediaDirContents();
+  return content;
 };
 
-export const addMediaImageFile = async (fileSystemPath: string) => {
-  const media = useStore.getState().media;
-  if (!media) return;
+export const addMediaImageFile = async (
+  fileSystemPath: string,
+  isThemeMedia: boolean = false
+) => {
   const dir = await appDataDir();
+
+  let media = useStore.getState().media;
+  if (isThemeMedia) {
+    const fileName = "themeAssets.json";
+    const hasThemeAssets = await exists(`media/${fileName}`, {
+      dir: BaseDirectory.AppData,
+    });
+    console.log(hasThemeAssets);
+    if (!hasThemeAssets) {
+      await createMedia(fileName);
+    }
+    media = await getMediaFileData(fileName);
+  }
+  if (!media) return;
+  const found = media.items.find(
+    ({ name }) => name === fileSystemPath.split("/").pop()
+  );
+  if (found) return found;
   const fileName = fileSystemPath.split("/").pop() || "";
   const sourceDes = `${dir}media/assets/source/${media.id}/${fileName}`;
-
+  console.log({ fileSystemPath });
   const source = await invoke("copy_file_to", {
     sourcePath: fileSystemPath,
     destinationPath: sourceDes,
@@ -120,23 +147,30 @@ export const addMediaImageFile = async (fileSystemPath: string) => {
     .catch(console.log);
 
   try {
-    const thumbnailFilePath = await createMediaFileThumbnail(sourceDes);
+    const thumbnailFilePath = await createMediaFileThumbnail(sourceDes, {
+      media,
+    });
     if (!thumbnailFilePath) return;
     const thumbnail = convertFileSrc(thumbnailFilePath);
     if (fileName && thumbnail && source) {
-      await addMediaEntryFile(media.name, {
+      const entry = {
         name: fileName,
         thumbnail,
         source,
-      });
+      };
+      const content = await addMediaEntryFile(media.name, entry, { media });
+      return content;
     }
   } catch (err) {
     console.error(err);
   }
 };
 
-export const createMediaFileThumbnail = async (sourceFilePath: string) => {
-  const media = useStore.getState().media;
+export const createMediaFileThumbnail = async (
+  sourceFilePath: string,
+  options?: { media?: MediaType }
+) => {
+  const media = options?.media || useStore.getState().media;
   if (!media) return;
   const dir = await appDataDir();
   const [fileName, ext] = sourceFilePath.split("/").pop()?.split(".") || [];
@@ -218,4 +252,5 @@ export const createMedia = async (name: string) => {
     dir: BaseDirectory.AppData,
     recursive: true,
   });
+  return id;
 };

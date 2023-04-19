@@ -1,15 +1,28 @@
-import { BaseDirectory, FileEntry, readTextFile } from "@tauri-apps/api/fs";
 import { useCallback, useEffect, useState } from "react";
 import {
   getSearchDirContents,
+  parseSearchIdentifier,
+  queryAPI,
   queryDirectory,
 } from "../../helpers/search.helper";
-import { Button, Select, Text, TextInput } from "@mantine/core";
+import {
+  ActionIcon,
+  Box,
+  BoxProps,
+  Button,
+  Center,
+  Group,
+  Select,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import useStore from "../../store";
 import styled from "@emotion/styled";
 import Slide from "../show/slide/Slide";
-import { getThemeEnties } from "../../helpers/theme.helper";
-import { SearchEntryField, SearchEntryType } from "../../types/LibraryTypes";
+import { SearchEntryField } from "../../types/LibraryTypes";
+import { IconPlaylistAdd } from "@tabler/icons-react";
+import SearchAddPlaylistMenu from "./SearchAddPlaylistMenu";
+import { addSearchContent } from "../../helpers/playlist.helper";
 
 const TextInputStyled = styled(TextInput)`
   & .mantine-TextInput-input {
@@ -73,21 +86,44 @@ const SearchGrid = styled.div`
   margin-top: 2rem;
 `;
 
-const SearchView = () => {
+const SearchResultControls = styled.div`
+  position: fixed;
+  bottom: 0;
+  background-color: #21212a;
+  width: 100%;
+`;
+
+const SearchView = ({ hidden }: { hidden: boolean }) => {
   const [slides, setSlides] = useState<string[]>([]);
   const [query, setQuery] = useState<Record<string, string>>({});
+  const [latestRunQuery, setLatestRunQuery] =
+    useState<Record<string, string>>();
   const { search } = useStore(({ search }) => ({ search }));
 
-  const runQuery = useCallback(async () => queryDirectory(query), [query]);
+  // TODO: add required variables
+  const runQuery = useCallback(async () => {
+    queryDirectory(query)
+      .then((res) => {
+        if (res?.items instanceof Array) {
+          setSlides(res.items);
+          setLatestRunQuery(res.query);
+        }
+      })
+      .catch(() => setLatestRunQuery(query));
+  }, [query]);
 
   const onFeildChange = useCallback(
-    (feild: SearchEntryField, value: string) => {
-      const regex = new RegExp(`[${feild.delimiters}]`);
-      const queryValues = value.split(regex);
-      const queryObject: Record<string, string> = queryValues.reduce(
+    (field: SearchEntryField, value: string) => {
+      let queryValues = [value];
+      if (field.delimiters) {
+        const regex = new RegExp(`[${field.delimiters}]`);
+        queryValues = value.split(regex);
+      }
+      console.log({ queryValues });
+      const queryObject: Record<string, string> = field.variables.reduce(
         (pre, cur, idx) => ({
           ...pre,
-          [feild.variables[idx]]: cur,
+          [cur]: queryValues[idx],
         }),
         {}
       );
@@ -105,12 +141,12 @@ const SearchView = () => {
   }, []);
 
   return (
-    <>
+    <Box hidden={hidden}>
       <SearchControlsContainer>
         <SearchControls>
           {search &&
             search?.fields.map((field) => {
-              const { type, name, variables, delimiters, data } = field;
+              const { type, name, data } = field;
               switch (type) {
                 case "input":
                   return (
@@ -130,11 +166,34 @@ const SearchView = () => {
                     <SearchSelect
                       key={name}
                       label={name}
-                      data={data}
+                      data={data || []}
                       value={query ? query[name] : ""}
                       onChange={(value) => {
                         if (!value) return;
                         onFeildChange(field, value);
+                      }}
+                    />
+                  );
+                }
+                case "api": {
+                  return (
+                    <TextInputStyled
+                      key={name}
+                      label={name}
+                      value={query ? query[name] : ""}
+                      onChange={(evt) => {
+                        const value = evt.currentTarget?.value || "";
+                        onFeildChange(field, value);
+                      }}
+                      onKeyUp={(evt) => {
+                        if (evt.key === "Enter") {
+                          console.log("fetch");
+                          queryAPI(query).then((res) => {
+                            if (res instanceof Array) {
+                              setSlides(res);
+                            }
+                          });
+                        }
                       }}
                     />
                   );
@@ -144,23 +203,65 @@ const SearchView = () => {
               }
             })}
         </SearchControls>
-        {search && <Button onClick={runQuery}>Search</Button>}
+        {latestRunQuery && (
+          <>
+            <Group style={{ gap: "1rem" }}>
+              <Text size="xs" color="white" mr={5}>
+                Query:
+              </Text>
+              {Object.entries(latestRunQuery).map(([key, value]) => (
+                <Group key={`${key}-key`} style={{ gap: ".1rem" }}>
+                  <Text weight="bold" size="xs" color="white">
+                    {key}:
+                  </Text>
+                  <Text key={key} size="xs" color="white">
+                    {value}
+                  </Text>
+                </Group>
+              ))}
+            </Group>
+          </>
+        )}
+        {search && !search.fields.find((f) => f.type === "api") && (
+          <Button onClick={runQuery}>Search</Button>
+        )}
       </SearchControlsContainer>
-      <SearchGrid>
-        {slides.map((slide, idx) => (
-          <Slide
-            key={idx}
-            slide={{ id: `slide-${idx}`, text: slide }}
-            size={350}
-            style={{
-              color: "white",
-              whiteSpace: "normal",
-              padding: "20rem",
-            }}
-          />
-        ))}
-      </SearchGrid>
-    </>
+      {slides.length ? (
+        <SearchGrid>
+          {slides.map((slide, idx) => (
+            <Slide
+              key={idx}
+              slide={{ id: `slide-${idx}`, text: slide }}
+              size={350}
+              style={{
+                color: "white",
+                whiteSpace: "normal",
+                padding: "20rem",
+              }}
+            />
+          ))}
+        </SearchGrid>
+      ) : (
+        <>
+          {search && latestRunQuery && (
+            <Center>
+              <Text color="white">No items to display</Text>
+            </Center>
+          )}
+        </>
+      )}
+      <SearchResultControls>
+        <SearchAddPlaylistMenu
+          disabled={false}
+          onPlaylistSelect={(playlistName) => {
+            addSearchContent(playlistName, {
+              name: parseSearchIdentifier(query),
+              content: slides,
+            });
+          }}
+        />
+      </SearchResultControls>
+    </Box>
   );
 };
 

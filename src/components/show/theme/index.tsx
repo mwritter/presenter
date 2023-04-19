@@ -1,18 +1,28 @@
 import styled from "@emotion/styled";
-import { useCallback, useEffect, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 
 import ThemeFontEditSection from "./toolbar/font";
 import ThemeStage from "./stage";
 import useStore from "../../../store";
-import { ThemeEntryStyleTypeKey } from "../../../types/LibraryTypes";
+import {
+  ThemeEntryContainerTypeKey,
+  ThemeEntryStyleTypeKey,
+} from "../../../types/LibraryTypes";
 import ThemeControls from "./controls";
+import { Select, TextInput } from "@mantine/core";
+import { getMediaDirContents } from "../../../helpers/media.helper";
+import BackgroundPickerSelect from "./toolbar/background/BackgroundPickerSelect";
+import { convertFileSrc } from "@tauri-apps/api/tauri";
+import { open } from "@tauri-apps/api/shell";
+import ThemeBackgroundEditSection from "./toolbar/background";
+import ThemeContainerEditSection from "./toolbar/container";
 
 const ThemeEditorContainer = styled.div`
   display: grid;
   grid-template:
     "controls toolbar"
     "stage toolbar";
-  grid-template-columns: 1fr 250px;
+  grid-template-columns: 1fr 350px;
   grid-template-rows: auto 1fr;
   height: 100vh;
   gap: 1rem;
@@ -27,7 +37,7 @@ const ThemeToolbar = styled.div`
   padding: 1rem;
 `;
 
-const DEFAULT_VALUES = {
+const DEFAULT_VALUES: Record<ThemeEntryStyleTypeKey, string> = {
   fontFamily: "Arial",
   fontSize: "15",
   justifyContent: "start",
@@ -36,15 +46,31 @@ const DEFAULT_VALUES = {
   display: "flex",
   flexDirection: "column",
   whiteSpace: "nowrap",
+  backgroundImage: "",
+  backgroundSize: "cover",
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "center",
+};
+
+const DEFAULT_CONTAINER_VALUES: Record<ThemeEntryContainerTypeKey, string> = {
+  display: "grid",
+  justifyContent: "start",
+  alignContent: "start",
+  height: "",
+  width: "",
+  top: "0",
+  left: "0",
 };
 
 const ThemeEditor = () => {
   const [selectedStyle, setSelectedStyle] =
     useState<Record<ThemeEntryStyleTypeKey, string>>(DEFAULT_VALUES);
+  const [containerStyle, setContainerStyle] = useState<
+    Record<ThemeEntryContainerTypeKey, string>
+  >(DEFAULT_CONTAINER_VALUES);
 
-  const { theme, setTheme } = useStore(({ theme, setTheme }) => ({
+  const { theme } = useStore(({ theme }) => ({
     theme,
-    setTheme,
   }));
 
   const onFontFamilySelectChange = useCallback(
@@ -53,13 +79,13 @@ const ThemeEditor = () => {
   );
 
   const onVerticalAlignmentChange = useCallback(
-    (justifyContent: string) =>
-      setSelectedStyle((cur) => ({ ...cur, justifyContent })),
+    (alignContent: string) =>
+      setContainerStyle((cur) => ({ ...cur, alignContent })),
     []
   );
 
-  const onHorizontalAlignmentChange = useCallback((alignItems: string) => {
-    setSelectedStyle((cur) => ({ ...cur, alignItems }));
+  const onHorizontalAlignmentChange = useCallback((justifyContent: string) => {
+    setContainerStyle((cur) => ({ ...cur, justifyContent }));
   }, []);
 
   const onFontSizeChange = useCallback(
@@ -71,23 +97,84 @@ const ThemeEditor = () => {
     []
   );
 
+  const onContainerLeftChange = useCallback(
+    (left: number) => {
+      console.log(containerStyle);
+      setContainerStyle((cur) => ({ ...cur, left: `${left}%` }));
+    },
+    [containerStyle]
+  );
+
+  const onContainerTopChange = useCallback((top: number) => {
+    setContainerStyle((cur) => ({ ...cur, top: `${top}%` }));
+  }, []);
+
+  const onContainerWidthChange = useCallback((width: number) => {
+    setContainerStyle((cur) => ({ ...cur, width: `${width}%` }));
+  }, []);
+
+  const onContainerHeightChange = useCallback((height: number) => {
+    setContainerStyle((cur) => ({ ...cur, height: `${height}%` }));
+  }, []);
+
+  const onBackgroundImageChange = useCallback((background: string) => {
+    setSelectedStyle((cur) => ({
+      ...cur,
+      backgroundImage: background ? `url(${background})` : "",
+    }));
+  }, []);
+
+  const onBackgroundSizeChange = useCallback((size: string) => {
+    setSelectedStyle((cur) => ({
+      ...cur,
+      backgroundSize: size,
+    }));
+  }, []);
+
+  useEffect(() => {
+    getMediaDirContents();
+  }, []);
+
   useEffect(() => {
     if (theme?.style) {
-      setSelectedStyle(theme.style);
+      setSelectedStyle((cur) => ({ ...cur, ...theme.style }));
+    }
+    if (theme?.container) {
+      setContainerStyle((cur) => ({ ...cur, ...theme.container }));
     }
   }, [theme]);
 
   return (
     <ThemeEditorContainer>
-      <ThemeControls theme={theme} selectedStyle={selectedStyle} />
-      <ThemeStage selectedStyle={selectedStyle} />
+      <ThemeControls
+        theme={theme}
+        selectedStyle={selectedStyle}
+        containerStyle={containerStyle}
+      />
+      <ThemeStage
+        selectedStyle={selectedStyle}
+        containerStyle={containerStyle}
+      />
       <ThemeToolbar>
         <ThemeFontEditSection
+          containerStyle={containerStyle}
           selectedStyle={selectedStyle}
           onFontFamilySelectChange={onFontFamilySelectChange}
           onHorizontalAlignmentChange={onHorizontalAlignmentChange}
           onVerticalAlignmentChange={onVerticalAlignmentChange}
           onFontSizeChange={onFontSizeChange}
+        />
+        <ThemeContainerEditSection
+          containerStyle={containerStyle}
+          onContainerLeftChange={onContainerLeftChange}
+          onContainerTopChange={onContainerTopChange}
+          onContainerWidthChange={onContainerWidthChange}
+          onContainerHeightChange={onContainerHeightChange}
+        />
+        <ThemeBackgroundEditSection
+          selectedStyle={selectedStyle}
+          onBackgroundImageChange={onBackgroundImageChange}
+          onBackgroundSizeChange={onBackgroundSizeChange}
         />
       </ThemeToolbar>
     </ThemeEditorContainer>

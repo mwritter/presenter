@@ -22,7 +22,6 @@ const FontSelect = styled(Select)`
     &[data-selected="true"],
     &[data-hovered="true"] {
       background-color: #476480;
-      color: black;
     }
   }
 

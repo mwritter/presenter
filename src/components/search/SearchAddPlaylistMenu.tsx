@@ -1,9 +1,9 @@
 import styled from "@emotion/styled";
 import { Menu, Text, ActionIcon, TextProps } from "@mantine/core";
-import { IconBrowserPlus } from "@tabler/icons-react";
+import { IconBrowserPlus, IconPlus } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { getPlaylistsDirContents } from "../../../helpers/playlist.helper";
-import useStore from "../../../store";
+import useStore from "../../store";
+import { getPlaylistsDirContents } from "../../helpers/playlist.helper";
 
 const PlaylistMenuDropdown = styled(Menu.Dropdown)`
   background-color: #21212a;
@@ -20,15 +20,12 @@ const PlaylistEntry = styled(Text)<PlaylistEntryProps>`
   }
 `;
 
-function MediaAddPlaylistMenu({
+function SearchAddPlaylistMenu({
   disabled,
   onPlaylistSelect,
-}: MediaAddPlaylistMenuProps) {
+}: SearchAddPlaylistMenuProps) {
   const [opened, setOpened] = useState(false);
-  const [playlists, playlist] = useStore(({ playlists, playlist }) => [
-    playlists,
-    playlist,
-  ]);
+  const [playlists] = useStore(({ playlists }) => [playlists]);
 
   useEffect(() => {
     getPlaylistsDirContents();
@@ -67,7 +64,7 @@ function MediaAddPlaylistMenu({
   );
 }
 
-interface MediaAddPlaylistMenuProps {
+interface SearchAddPlaylistMenuProps {
   disabled: boolean;
   onPlaylistSelect: (playlistName: string) => void;
 }
@@ -77,4 +74,4 @@ type PlaylistEntryProps = TextProps & {
   onClick: () => void;
 };
 
-export default MediaAddPlaylistMenu;
+export default SearchAddPlaylistMenu;

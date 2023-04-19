@@ -6,12 +6,14 @@ import {
   writeTextFile,
 } from "@tauri-apps/api/fs";
 import {
+  ThemeEntryContainerType,
   ThemeEntryStyleType,
   ThemeEntryStyleTypeKey,
   ThemeEntryType,
 } from "../types/LibraryTypes";
 import { defatulTheme } from "../components/show/theme/styles/default";
 import useStore from "../store";
+import { Container } from "@mantine/core";
 
 /**
  * Theme Entries Shape
@@ -56,22 +58,27 @@ export const write = async (content: ThemeEntryType[]) => {
 
 export const addThemeEntry = async (
   name: string,
-  style: ThemeEntryType["style"]
+  style: ThemeEntryStyleType,
+  container: ThemeEntryContainerType
 ) => {
   const currentThemes = useStore.getState().themes;
-  const newThemes: ThemeEntryType[] = [...currentThemes, { name, style }];
+  const newThemes: ThemeEntryType[] = [
+    ...currentThemes,
+    { name, style, container },
+  ];
 
   await write(newThemes);
 };
 
 export const editThemeEntry = async (
   name: string,
-  style: ThemeEntryType["style"]
+  style: ThemeEntryType["style"],
+  container: ThemeEntryContainerType
 ) => {
   const currentThemes = useStore.getState().themes;
   const updatedThemes = currentThemes.map((theme) => {
     if (theme.name === name) {
-      return { ...theme, style };
+      return { ...theme, style, container };
     }
     return theme;
   });
@@ -91,6 +98,7 @@ export const getThemeEnties = async () => {
   });
   const entries: ThemeEntryType[] = JSON.parse(themes);
   useStore.getState().setThemes(entries);
+  useStore.getState().projector?.webview?.emit("set-themes", entries);
 };
 
 export const buildCSS = (themes: ThemeEntryType[]) => {

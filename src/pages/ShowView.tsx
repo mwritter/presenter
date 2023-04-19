@@ -28,15 +28,8 @@ const GridItemSizeControl = styled(Slider)<SliderProps>`
 
 const ShowView = () => {
   const [gridItemSize, setGridItemSize] = useState<number>(0);
-  const [sliderValue, setSliderValue] = useState<number>(0);
-  const [mode, show, playlist, setShow, library] = useStore(
-    ({ mode, playlist, show, setShow, library }) => [
-      mode,
-      show,
-      playlist,
-      setShow,
-      library,
-    ]
+  const [mode, show, playlist, setShow] = useStore(
+    ({ mode, playlist, show, setShow }) => [mode, show, playlist, setShow]
   );
 
   useEffect(() => {
@@ -51,8 +44,8 @@ const ShowView = () => {
         <PlaylistShowView slideSize={gridItemSize} />
         <ShowViewControls>
           <GridItemSizeControl
-            defaultValue={25}
-            min={25}
+            defaultValue={40}
+            min={40}
             value={gridItemSize}
             onChange={setGridItemSize}
           />
@@ -67,9 +60,7 @@ const ShowView = () => {
       <Box hidden={mode !== PresenterMode.THEME}>
         <ThemeEditor />
       </Box>
-      <Box hidden={mode !== PresenterMode.SEARCH}>
-        <SearchView />
-      </Box>
+      <SearchView hidden={mode !== PresenterMode.SEARCH} />
     </ShowViewContainer>
   );
 };

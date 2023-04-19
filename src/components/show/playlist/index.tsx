@@ -32,7 +32,7 @@ const PlaylistShowView = ({ slideSize }: { slideSize: number }) => {
 
   const getSlideSize = useCallback(() => {
     console.log(slideSize);
-    return slideSize * 0.01 * 1400;
+    return slideSize * 0.01 * 800;
   }, [slideSize]);
 
   const setActiveSlide = useCallback(

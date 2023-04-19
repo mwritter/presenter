@@ -2,20 +2,27 @@ import styled from "@emotion/styled";
 import { Button } from "@mantine/core";
 import React from "react";
 import { editThemeEntry } from "../../../../helpers/theme.helper";
-import { ThemeEntryType } from "../../../../types/LibraryTypes";
+import {
+  ThemeEntryContainerType,
+  ThemeEntryType,
+} from "../../../../types/LibraryTypes";
 
 const ThemeControlsStyled = styled.div`
   grid-area: controls;
   margin-top: 1rem;
 `;
 
-const ThemeControls = ({ theme, selectedStyle }: ThemeControlsProps) => {
+const ThemeControls = ({
+  theme,
+  selectedStyle,
+  containerStyle,
+}: ThemeControlsProps) => {
   return (
     <ThemeControlsStyled>
       <Button
         onClick={() => {
           if (theme) {
-            editThemeEntry(theme.name, selectedStyle);
+            editThemeEntry(theme.name, selectedStyle, containerStyle);
           }
         }}
       >
@@ -28,6 +35,7 @@ const ThemeControls = ({ theme, selectedStyle }: ThemeControlsProps) => {
 interface ThemeControlsProps {
   theme: ThemeEntryType | null;
   selectedStyle: Record<string, string>;
+  containerStyle: ThemeEntryContainerType;
 }
 
 export default ThemeControls;

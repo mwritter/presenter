@@ -3,7 +3,10 @@ import { Title } from "@mantine/core";
 import FontAlignment from "./FontAlignment";
 import FontFamilySelect from "./FontFamilySelect";
 import FontSizeInput from "./FontSizeInput";
-import { ThemeEntryStyleType } from "../../../../../types/LibraryTypes";
+import {
+  ThemeEntryContainerType,
+  ThemeEntryStyleType,
+} from "../../../../../types/LibraryTypes";
 
 const DEFAULT_VALUES = {
   fontFamily: "Arial",
@@ -20,6 +23,7 @@ const ThemeToolbarSection = styled.div`
 
 const ThemeFontEditSection = ({
   selectedStyle,
+  containerStyle,
   onFontFamilySelectChange,
   onFontSizeChange,
   onHorizontalAlignmentChange,
@@ -31,8 +35,8 @@ const ThemeFontEditSection = ({
         FONT
       </Title>
       <FontAlignment
-        vertical={selectedStyle.justifyContent}
-        horizontal={selectedStyle.alignItems}
+        vertical={containerStyle.alignContent}
+        horizontal={containerStyle.justifyContent}
         onHorizontalAlignmentChange={onHorizontalAlignmentChange}
         onVerticalAlignmentChange={onVerticalAlignmentChange}
       />
@@ -50,6 +54,7 @@ const ThemeFontEditSection = ({
 
 interface ThemeFontEditSectionProps {
   selectedStyle: ThemeEntryStyleType;
+  containerStyle: ThemeEntryContainerType;
   onHorizontalAlignmentChange: (value: string) => void;
   onVerticalAlignmentChange: (value: string) => void;
   onFontFamilySelectChange: (value: string) => void;

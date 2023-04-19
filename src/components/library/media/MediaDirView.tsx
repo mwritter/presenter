@@ -57,14 +57,11 @@ const MediaDirView = () => {
   const [selected, setSelected] = useState<string>(media?.name || "");
   const [addInput, setAddInput] = useState(false);
 
-  const selectMediaEntry = useCallback(
-    async ({ path, name = "" }: FileEntry) => {
-      const mediaFileData = await getMediaFileData(path);
-      setMedia(mediaFileData);
-      setSelected(name);
-    },
-    []
-  );
+  const selectMediaEntry = useCallback(async ({ name = "" }: FileEntry) => {
+    const mediaFileData = await getMediaFileData(name);
+    setMedia(mediaFileData);
+    setSelected(name);
+  }, []);
 
   useEffect(() => {
     getMediaDirContents();
