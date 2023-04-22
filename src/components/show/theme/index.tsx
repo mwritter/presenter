@@ -7,6 +7,7 @@ import useStore from "../../../store";
 import {
   ThemeEntryContainerTypeKey,
   ThemeEntryStyleTypeKey,
+  ThemeEntryTagType,
 } from "../../../types/LibraryTypes";
 import ThemeControls from "./controls";
 import { Select, TextInput } from "@mantine/core";
@@ -16,6 +17,7 @@ import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/shell";
 import ThemeBackgroundEditSection from "./toolbar/background";
 import ThemeContainerEditSection from "./toolbar/container";
+import ThemeTagEditSection from "./toolbar/tag";
 
 const ThemeEditorContainer = styled.div`
   display: grid;
@@ -25,6 +27,7 @@ const ThemeEditorContainer = styled.div`
   grid-template-columns: 1fr 350px;
   grid-template-rows: auto 1fr;
   height: 100vh;
+  overflow: hidden;
   gap: 1rem;
   margin-left: 1rem;
 `;
@@ -35,6 +38,7 @@ const ThemeToolbar = styled.div`
   flex-direction: column;
   background-color: #21212a;
   padding: 1rem;
+  overflow-y: scroll;
 `;
 
 const DEFAULT_VALUES: Record<ThemeEntryStyleTypeKey, string> = {
@@ -68,6 +72,8 @@ const ThemeEditor = () => {
   const [containerStyle, setContainerStyle] = useState<
     Record<ThemeEntryContainerTypeKey, string>
   >(DEFAULT_CONTAINER_VALUES);
+  const [tagStyle, setTagStyle] = useState<ThemeEntryTagType>();
+  const [tagText, setTagText] = useState<string>("Tag Text");
 
   const { theme } = useStore(({ theme }) => ({
     theme,
@@ -140,12 +146,19 @@ const ThemeEditor = () => {
     getMediaDirContents();
   }, []);
 
+  const onSetTagStyles = useCallback((style: Partial<ThemeEntryTagType>) => {
+    setTagStyle((cur) => ({ ...cur, ...style } as ThemeEntryTagType));
+  }, []);
+
   useEffect(() => {
     if (theme?.style) {
       setSelectedStyle((cur) => ({ ...cur, ...theme.style }));
     }
     if (theme?.container) {
       setContainerStyle((cur) => ({ ...cur, ...theme.container }));
+    }
+    if (theme?.tag) {
+      setTagStyle((cur) => ({ ...cur, ...theme.tag } as ThemeEntryTagType));
     }
   }, [theme]);
 
@@ -155,10 +168,13 @@ const ThemeEditor = () => {
         theme={theme}
         selectedStyle={selectedStyle}
         containerStyle={containerStyle}
+        tagStyle={tagStyle as ThemeEntryTagType}
       />
       <ThemeStage
         selectedStyle={selectedStyle}
         containerStyle={containerStyle}
+        tagStyle={tagStyle as ThemeEntryTagType}
+        tagText={tagText}
       />
       <ThemeToolbar>
         <ThemeFontEditSection
@@ -180,6 +196,12 @@ const ThemeEditor = () => {
           selectedStyle={selectedStyle}
           onBackgroundImageChange={onBackgroundImageChange}
           onBackgroundSizeChange={onBackgroundSizeChange}
+        />
+        <ThemeTagEditSection
+          tagStyle={tagStyle}
+          tagText={tagText}
+          onSetTagText={setTagText}
+          onSetTagStyle={onSetTagStyles}
         />
       </ThemeToolbar>
     </ThemeEditorContainer>

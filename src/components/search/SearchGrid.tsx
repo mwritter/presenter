@@ -14,13 +14,12 @@ const SearchGridContainer = styled.div`
   justify-content: center;
   align-content: start;
   align-self: center;
-  overflow: scroll;
+  overflow-y: scroll;
 `;
 
 const SearchGrid = ({
   slides,
   theme,
-  tagStyle,
   search,
   query,
   onGetTag,
@@ -39,7 +38,6 @@ const SearchGrid = ({
                 tag: onGetTag(idx),
               }}
               size={350}
-              tagStyle={tagStyle}
             />
           ))
         : search &&
@@ -55,7 +53,6 @@ const SearchGrid = ({
 interface SearchGridProps {
   slides: string[];
   theme: string;
-  tagStyle?: ThemeEntryTagType;
   search: SearchEntryType | null;
   query?: Record<string, string>;
   onGetTag: (index: number) => string;

@@ -7,6 +7,7 @@ import { useState } from "react";
 import {
   ThemeEntryContainerType,
   ThemeEntryStyleType,
+  ThemeEntryTagType,
   ThemeEntryType,
 } from "../../../../types/LibraryTypes";
 import useStore from "../../../../store";
@@ -21,6 +22,7 @@ const ThemeStageContainer = styled.div`
   width: 100%;
   height: 100%;
   display: grid;
+  place-content: center;
 `;
 
 const ThemeStageBody = styled.div`
@@ -35,7 +37,12 @@ const CenterIndicator = styled.div`
   background-color: red;
 `;
 
-const ThemeStage = ({ selectedStyle, containerStyle }: ThemeStageProps) => {
+const ThemeStage = ({
+  selectedStyle,
+  containerStyle,
+  tagStyle,
+  tagText,
+}: ThemeStageProps) => {
   const [position, setPosition] = useState({ x: 0.2, y: 0.6 });
   const { ref, active } = useMove(setPosition);
   const { width: stageWidth, ref: stageRef } = useResizeDetector();
@@ -59,9 +66,11 @@ const ThemeStage = ({ selectedStyle, containerStyle }: ThemeStageProps) => {
         >
           <TextSlide
             containerStyle={containerStyle}
+            tagStyle={tagStyle}
             slide={{
               id: "theme-slide",
               text: `Text`,
+              tag: tagText,
             }}
           />
         </ThemeStageBody>
@@ -73,6 +82,8 @@ const ThemeStage = ({ selectedStyle, containerStyle }: ThemeStageProps) => {
 interface ThemeStageProps {
   selectedStyle: Record<string, string>;
   containerStyle: ThemeEntryContainerType;
+  tagStyle: ThemeEntryTagType;
+  tagText?: string;
 }
 
 export default ThemeStage;

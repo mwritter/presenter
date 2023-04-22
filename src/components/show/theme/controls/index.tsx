@@ -4,6 +4,7 @@ import React from "react";
 import { editThemeEntry } from "../../../../helpers/theme.helper";
 import {
   ThemeEntryContainerType,
+  ThemeEntryTagType,
   ThemeEntryType,
 } from "../../../../types/LibraryTypes";
 
@@ -16,6 +17,7 @@ const ThemeControls = ({
   theme,
   selectedStyle,
   containerStyle,
+  tagStyle,
 }: ThemeControlsProps) => {
   return (
     <ThemeControlsStyled>
@@ -26,6 +28,7 @@ const ThemeControls = ({
               name: theme.name,
               style: selectedStyle,
               container: containerStyle,
+              tag: tagStyle,
             });
           }
         }}
@@ -40,6 +43,7 @@ interface ThemeControlsProps {
   theme: ThemeEntryType | null;
   selectedStyle: Record<string, string>;
   containerStyle: ThemeEntryContainerType;
+  tagStyle: ThemeEntryTagType;
 }
 
 export default ThemeControls;

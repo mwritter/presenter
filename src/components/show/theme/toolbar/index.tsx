@@ -7,7 +7,6 @@ import { PresenterMode } from "../../../../types/LibraryTypes";
 
 const ToolbarStyled = styled.div`
   grid-area: toolbar;
-  background-color: green;
   padding: 1rem;
   border: 5px solid #282c34;
   border-radius: 10px;

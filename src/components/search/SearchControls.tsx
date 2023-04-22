@@ -1,6 +1,10 @@
 import styled from "@emotion/styled";
-import { Button, Group, Select, Text, TextInput } from "@mantine/core";
-import { SearchEntryField, SearchEntryType } from "../../types/LibraryTypes";
+import { Button, Group, Select, Stack, Text, TextInput } from "@mantine/core";
+import {
+  SearchEntryField,
+  SearchEntryType,
+  ThemeEntryType,
+} from "../../types/LibraryTypes";
 
 const TextInputStyled = styled(TextInput)`
   & .mantine-TextInput-input {
@@ -30,7 +34,6 @@ const SearchControlsStyled = styled.div`
 
 const SearchSelect = styled(Select)`
   & .mantine-Input-input {
-    font-family: ${(p) => p.value};
     color: white;
     background-color: #282c34;
   }
@@ -55,23 +58,34 @@ const SearchSelect = styled(Select)`
   }
 `;
 
+const SystemControls = styled.div``;
+
 const SearchControls = ({
   search,
+  themes,
+  theme,
+  onSetTheme,
   onFeildChange,
   query,
   onRunQuery,
+  errorField,
 }: SearchControlsProps) => {
   return (
     <SearchControlsContainer>
       <SearchControlsStyled>
         {search &&
           search?.fields.map((field) => {
-            const { type, name, data } = field;
+            const { type, name, data, variables } = field;
             switch (type) {
               case "input":
                 return (
                   <TextInputStyled
                     key={name + "-input"}
+                    error={
+                      errorField && variables.includes(errorField)
+                        ? errorField
+                        : ""
+                    }
                     label={name}
                     value={query ? query[name] : ""}
                     onChange={(evt) => {
@@ -83,6 +97,12 @@ const SearchControls = ({
               case "select": {
                 return (
                   <SearchSelect
+                    searchable
+                    error={
+                      errorField && variables.includes(errorField)
+                        ? errorField
+                        : ""
+                    }
                     key={name + "-select"}
                     label={name}
                     data={data || []}
@@ -116,18 +136,37 @@ const SearchControls = ({
           </Group>
         </>
       )}
-      {search && !search.fields.find((f) => f.type === "api") && (
-        <Button onClick={onRunQuery}>Search</Button>
-      )}
+      <SystemControls>
+        {search && !search.fields.find((f) => f.type === "api") && (
+          <Stack style={{ flexDirection: "row", alignItems: "end" }}>
+            <SearchSelect
+              label="Theme"
+              value={theme?.name}
+              data={themes.map(({ name }) => ({ value: name, label: name }))}
+              onChange={(value) => {
+                const found = themes.find(({ name }) => name === value);
+                if (found) {
+                  onSetTheme(found);
+                }
+              }}
+            />
+            <Button onClick={onRunQuery}>Search</Button>
+          </Stack>
+        )}
+      </SystemControls>
     </SearchControlsContainer>
   );
 };
 
 interface SearchControlsProps {
   search: SearchEntryType | null;
+  theme?: ThemeEntryType;
+  themes: ThemeEntryType[];
+  onSetTheme: (theme: ThemeEntryType) => void;
   onFeildChange: (feild: SearchEntryField, value: string) => void;
   query?: Record<string, string>;
   onRunQuery: () => void;
+  errorField: string | null;
 }
 
 export default SearchControls;

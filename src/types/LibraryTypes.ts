@@ -140,6 +140,7 @@ export type SearchEntryType = {
     url?: string;
     headers?: string;
     args?: string[];
+    cmd?: string;
   };
   validator: Record<string, SearchValidator>;
 };

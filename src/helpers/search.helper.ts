@@ -262,16 +262,36 @@ export const parseSearchTag = (tag: string, index?: number) => {
 
 export const queryPresenterCLI = async (
   query: Record<string, string>
-): Promise<{ text: string[]; query: Record<string, string> }> => {
+): Promise<{
+  text: string[];
+  query: Record<string, string>;
+  errorMessage?: string;
+  errorField?: string;
+}> => {
   const validatedQuery = await validateSearchQuery(query);
-  if (validatedQuery.issue) {
-    console.log("issue with: ", validatedQuery.issue);
-    return { text: [], query: validatedQuery.query };
+  const search = useStore.getState().search;
+  console.log("Valid", validatedQuery);
+  if (validatedQuery.issue || !search) {
+    console.log("issue with: ", validatedQuery.issue || "no search outline");
+    return {
+      text: [],
+      query: validatedQuery.query,
+      errorField: validatedQuery.issue || "",
+      errorMessage: validatedQuery.issue ?? "",
+    };
   }
+  const {
+    extractor: { args = "", cmd = "" },
+  } = search;
   const value = JSON.stringify(query);
+  // args is the cmd arguments
+  // value is the search query JSON
+  // cmd is the actual commend that will be executed
+  // on your machine, make sure to have this command accessible globally on your machine 'presenter-cli'
   const commandResult = await new Command("presenter-cli", [
-    "-s",
+    ...args,
     value,
+    cmd,
   ]).execute();
 
   if (commandResult.code !== 0) {
@@ -296,7 +316,12 @@ export const queryPresenterCLI = async (
 
 export const runQuery = async (query: Record<string, string>) => {
   let text: string[] = [];
-  let result = { text, query };
+  let result: {
+    text: string[];
+    query: Record<string, string>;
+    errorMessage?: string | undefined;
+    errorField?: string | undefined;
+  } = { text, query };
   const search = useStore.getState().search;
   if (!search) return result;
 
@@ -327,10 +352,12 @@ const validateSearchQuery = async (query: Record<string, string>) => {
   let parseKey = key;
   let issue = null;
 
-  for (let variable in query) {
+  for (let variable in validator) {
     if (validator) {
       const valid = validator[variable];
       if (valid) {
+        console.log(variable);
+        console.log(valid);
         if (valid.required && (!(variable in query) || !query[variable])) {
           issue = variable;
           break;
