@@ -23,6 +23,7 @@ const LibraryShowView = () => {
         <ShowViewGrid>
           {library?.slides.map((slide, idx) => (
             <Slide
+              index={idx}
               key={idx}
               theme={"default"}
               active={false}

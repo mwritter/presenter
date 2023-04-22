@@ -32,6 +32,11 @@
             "name": "get-env-variable",
             "cmd": "printenv",
             "args": true
+          },
+          {
+            "name": "presenter-cli",
+            "cmd": "presenter-cli",
+            "args": true
           }
         ]
       },

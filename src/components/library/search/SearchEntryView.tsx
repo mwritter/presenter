@@ -5,8 +5,8 @@ import { IconPlus } from "@tabler/icons-react";
 import { SearchEntryType } from "../../../types/LibraryTypes";
 import useStore from "../../../store";
 import {
-  getSearchDirContents,
-  setSearchDirectory,
+  getSearchEntries,
+  setSearchEntry,
 } from "../../../helpers/search.helper";
 
 const SearchDirContainer = styled.section``;
@@ -49,15 +49,13 @@ const ScrollableList = styled.div`
 `;
 
 const SearchEntryView = () => {
-  const { searchDirectories, search } = useStore(
-    ({ searchDirectories, search }) => ({
-      searchDirectories,
-      search,
-    })
-  );
+  const { searchEntries, search } = useStore(({ searchEntries, search }) => ({
+    searchEntries,
+    search,
+  }));
 
   useEffect(() => {
-    getSearchDirContents();
+    getSearchEntries();
   }, []);
   // TODO: add a segment control for directory vs api search
   return (
@@ -69,18 +67,18 @@ const SearchEntryView = () => {
         </ActionIcon>
       </SearchHeaderContainer>
       <ScrollableList>
-        {searchDirectories.map((directory) => {
+        {searchEntries.map((entry) => {
           return (
             <SearchEntry
-              selected={search?.directory === directory.name}
-              key={directory.name}
+              selected={search?.name === entry.name}
+              key={entry.name}
               onClick={() => {
-                if (directory.name) {
-                  setSearchDirectory(directory.name);
+                if (entry) {
+                  setSearchEntry(entry);
                 }
               }}
             >
-              {directory.name}
+              {entry.name}
             </SearchEntry>
           );
         })}

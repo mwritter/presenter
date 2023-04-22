@@ -31,7 +31,6 @@ const PlaylistShowView = ({ slideSize }: { slideSize: number }) => {
   const [show, playlist] = useStore(({ playlist, show }) => [show, playlist]);
 
   const getSlideSize = useCallback(() => {
-    console.log(slideSize);
     return slideSize * 0.01 * 800;
   }, [slideSize]);
 
@@ -114,6 +113,7 @@ const PlaylistShowView = ({ slideSize }: { slideSize: number }) => {
                         transition={{ duration: 1, ease: "easeIn" }}
                       >
                         <Slide
+                          index={idx}
                           size={getSlideSize()}
                           theme={section?.theme}
                           active={activeSlide.slideId === slide.id}

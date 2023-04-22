@@ -2,7 +2,11 @@ import { CSSProperties, useRef, useState } from "react";
 import styled from "@emotion/styled";
 import { Groups, GroupType } from "../helpers/slide.helper";
 import SlideGroupIndicatorMenu from "./SlideGroupIndicatorMenu";
-import { SlideEntryType } from "../../../types/LibraryTypes";
+import {
+  SlideEntryType,
+  ThemeEntryContainerType,
+  ThemeEntryTagType,
+} from "../../../types/LibraryTypes";
 import MediaSlide from "./MediaSlide";
 import TextSlide from "./TextSlide";
 import useProjectorScale from "../../../hooks/useProjectorScale";
@@ -32,6 +36,9 @@ const Slide = ({
   onGroupChange,
   size,
   style = {},
+  index,
+  tagStyle,
+  containerStyle,
 }: SlideProps) => {
   const [openedGroupMenu, setOpenedGroupMenu] = useState(false);
   const slideRef = useRef<HTMLDivElement>(null);
@@ -79,7 +86,13 @@ const Slide = ({
             }}
             className={theme ? `theme-slide-${theme}` : "theme-slide-default"}
           >
-            <TextSlide themeName={theme} slide={slide} />
+            <TextSlide
+              index={index}
+              themeName={theme}
+              slide={slide}
+              tagStyle={tagStyle}
+              containerStyle={containerStyle}
+            />
           </div>
         )}
         {slide.group && onGroupChange && (
@@ -104,6 +117,9 @@ interface SlideProps {
   onGroupChange?: (group: GroupType) => void;
   size?: number;
   style?: CSSProperties | null;
+  index?: number;
+  tagStyle?: ThemeEntryTagType;
+  containerStyle?: Partial<ThemeEntryContainerType>;
 }
 
 interface SlideGroupIndicatorProps {

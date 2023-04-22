@@ -9,11 +9,11 @@ import {
   ThemeEntryContainerType,
   ThemeEntryStyleType,
   ThemeEntryStyleTypeKey,
+  ThemeEntryTagType,
   ThemeEntryType,
 } from "../types/LibraryTypes";
 import { defatulTheme } from "../components/show/theme/styles/default";
 import useStore from "../store";
-import { Container } from "@mantine/core";
 
 /**
  * Theme Entries Shape
@@ -59,31 +59,43 @@ export const write = async (content: ThemeEntryType[]) => {
 export const addThemeEntry = async (
   name: string,
   style: ThemeEntryStyleType,
-  container: ThemeEntryContainerType
+  container: ThemeEntryContainerType,
+  tag: ThemeEntryTagType
 ) => {
   const currentThemes = useStore.getState().themes;
   const newThemes: ThemeEntryType[] = [
     ...currentThemes,
-    { name, style, container },
+    { name, style, container, tag },
   ];
 
   await write(newThemes);
 };
 
-export const editThemeEntry = async (
-  name: string,
-  style: ThemeEntryType["style"],
-  container: ThemeEntryContainerType
-) => {
+export const editThemeEntry = async ({
+  name,
+  style,
+  container,
+  tag,
+}: {
+  name: string;
+  style?: Partial<ThemeEntryStyleType>;
+  container?: Partial<ThemeEntryContainerType>;
+  tag?: Partial<ThemeEntryTagType>;
+}) => {
   const currentThemes = useStore.getState().themes;
   const updatedThemes = currentThemes.map((theme) => {
     if (theme.name === name) {
-      return { ...theme, style, container };
+      return {
+        ...theme,
+        style: { ...theme.style, ...style },
+        container: { ...theme.container, ...container },
+        tag: { ...theme.tag, ...tag },
+      };
     }
     return theme;
   });
 
-  await write(updatedThemes);
+  await write(updatedThemes as ThemeEntryType[]);
 };
 
 export const getThemeEnties = async () => {

@@ -17,6 +17,7 @@ import {
 } from "../types/LibraryTypes";
 import { getLibraryFileDataForPlaylist } from "./library.helper";
 import { Groups } from "../components/show/helpers/slide.helper";
+import { parseSearchTag } from "./search.helper";
 
 export const getPlaylistsDirContents = async () => {
   const hasPlaylist = await exists("playlists", { dir: BaseDirectory.AppData });
@@ -202,7 +203,7 @@ export const addMediaContent = async (
 
 export const addSearchContent = async (
   playlistName: string,
-  { name, content }: { name: string; content: string[] }
+  { name, tag, content }: { name: string; tag: string; content: string[] }
 ) => {
   const playlist = await parsePlaylist(playlistName);
   playlist.content = [
@@ -210,9 +211,10 @@ export const addSearchContent = async (
     {
       id: uuid(),
       name,
-      slides: content.map((text) => ({
+      slides: content.map((text, idx) => ({
         id: uuid(),
         text,
+        tag: parseSearchTag(tag, idx),
         group: "NONE",
       })),
       theme: "default",

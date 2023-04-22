@@ -7,7 +7,6 @@ export const readEnvVariable = async (
     "get-env-variable",
     variableName
   ).execute();
-  console.log(commandResult);
   if (commandResult.code !== 0) {
     throw new Error(commandResult.stderr);
   }

@@ -22,7 +22,11 @@ const ThemeControls = ({
       <Button
         onClick={() => {
           if (theme) {
-            editThemeEntry(theme.name, selectedStyle, containerStyle);
+            editThemeEntry({
+              name: theme.name,
+              style: selectedStyle,
+              container: containerStyle,
+            });
           }
         }}
       >

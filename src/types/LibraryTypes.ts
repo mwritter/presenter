@@ -46,6 +46,7 @@ export type SlideEntryType = {
   text?: string;
   group?: GroupType;
   media?: MediaEntryType;
+  tag?: string;
 };
 
 export type LibrarySlideEntryType = {
@@ -85,6 +86,7 @@ export type ThemeEntryType = {
     source: string;
   };
   container: ThemeEntryContainerType;
+  tag?: ThemeEntryTagType;
 };
 
 export type ThemeEntryStyleType = {
@@ -112,19 +114,32 @@ export type ThemeEntryContainerType = {
   display: string;
 };
 
+export type ThemeEntryTagType = {
+  top: string;
+  left: string;
+  fontSize: string;
+  fontFamily: string;
+  color: string;
+};
+
 export type ThemeEntryStyleTypeKey = keyof ThemeEntryStyleType;
 export type ThemeEntryContainerTypeKey = keyof ThemeEntryContainerType;
+export type ThemeEntryTagTypeKey = keyof ThemeEntryTagType;
 
 export type SearchEntryType = {
-  directory: string;
+  name: string;
+  type: string;
+  directory?: string;
   identifier: string;
   fields: SearchEntryField[];
+  tag?: string;
   extractor: {
-    path: string;
-    key: string;
-    type: "string" | "number" | "array";
+    path?: string;
+    key?: string;
+    type: string;
     url?: string;
     headers?: string;
+    args?: string[];
   };
   validator: Record<string, SearchValidator>;
 };
@@ -138,11 +153,12 @@ export type SearchEntryField = {
 };
 
 export type SearchValidator = {
-  value?: string[];
+  values?: string[];
   pattern?: string;
   type?: string;
   path?: string;
   required?: boolean;
   minLength?: number;
   identifier?: string;
+  tag?: string;
 };

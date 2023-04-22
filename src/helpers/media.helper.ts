@@ -125,7 +125,6 @@ export const addMediaImageFile = async (
     const hasThemeAssets = await exists(`media/${fileName}`, {
       dir: BaseDirectory.AppData,
     });
-    console.log(hasThemeAssets);
     if (!hasThemeAssets) {
       await createMedia(fileName);
     }
@@ -138,7 +137,6 @@ export const addMediaImageFile = async (
   if (found) return found;
   const fileName = fileSystemPath.split("/").pop() || "";
   const sourceDes = `${dir}media/assets/source/${media.id}/${fileName}`;
-  console.log({ fileSystemPath });
   const source = await invoke("copy_file_to", {
     sourcePath: fileSystemPath,
     destinationPath: sourceDes,

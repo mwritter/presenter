@@ -10,6 +10,11 @@ import {
   ThemeEntryType,
 } from "../../../../types/LibraryTypes";
 import useStore from "../../../../store";
+import {
+  IconCross,
+  IconCrosshair,
+  IconFocusCentered,
+} from "@tabler/icons-react";
 
 const ThemeStageContainer = styled.div`
   grid-area: stage;
@@ -20,6 +25,14 @@ const ThemeStageContainer = styled.div`
 
 const ThemeStageBody = styled.div`
   overflow: hidden;
+`;
+
+const CenterIndicator = styled.div`
+  position: absolute;
+  height: 15px;
+  width: 15px;
+  border-radius: 100%;
+  background-color: red;
 `;
 
 const ThemeStage = ({ selectedStyle, containerStyle }: ThemeStageProps) => {

@@ -26,7 +26,7 @@ interface AppState {
   playlists: FileEntry[];
   libraries: FileEntry[];
   mediaFiles: FileEntry[];
-  searchDirectories: FileEntry[];
+  searchEntries: SearchEntryType[];
   themes: ThemeEntryType[];
   mode: PresenterMode;
 }
@@ -39,7 +39,7 @@ interface Action {
   setMedia: (media: MediaType) => void;
   setTheme: (theme: ThemeEntryType) => void;
   setSearch: (search: SearchEntryType) => void;
-  setSearchDirectories: (directories: FileEntry[]) => void;
+  setSearchEntries: (entries: SearchEntryType[]) => void;
   setMediaFiles: (files: FileEntry[]) => void;
   setThemes: (themes: ThemeEntryType[]) => void;
   setShow: (show: PlaylistType) => void;
@@ -57,7 +57,7 @@ const useStore = create<AppState & Action>((set) => ({
   libraries: [],
   mediaFiles: [],
   themes: [],
-  searchDirectories: [],
+  searchEntries: [],
   playlist: null,
   library: null,
   media: null,
@@ -80,8 +80,7 @@ const useStore = create<AppState & Action>((set) => ({
   setSearch: (search) => set(() => ({ search })),
   setMediaFiles: (mediaFiles) => set(() => ({ mediaFiles })),
   setThemes: (themes) => set(() => ({ themes })),
-  setSearchDirectories: (searchDirectories) =>
-    set(() => ({ searchDirectories })),
+  setSearchEntries: (searchEntries) => set(() => ({ searchEntries })),
   setShow: (show) => set(() => ({ show })),
   setProjector: (projector) => set(() => ({ projector })),
   setPrompt: (prompt) => set(() => ({ prompt })),

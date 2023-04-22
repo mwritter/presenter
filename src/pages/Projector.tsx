@@ -44,7 +44,6 @@ const listenForMessageToggle = async (
   callBack: ({ show, text, style }: MessageType) => void
 ) => {
   await listen<MessageType>("toggle-message", async ({ payload }) => {
-    console.log(payload);
     callBack(payload);
   });
 };

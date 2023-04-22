@@ -63,7 +63,7 @@ const FontFamilySelect = ({ value, onChange }: FontFamilySelectProps) => {
 };
 
 interface FontFamilySelectProps {
-  value: CSSProperties["fontFamily"];
+  value?: CSSProperties["fontFamily"];
   onChange: (value: string) => void;
 }
 

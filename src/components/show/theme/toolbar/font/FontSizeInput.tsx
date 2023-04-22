@@ -33,7 +33,7 @@ const FontSizeInput = ({ value = "15", onChange }: FontSizeInputProps) => {
 };
 
 interface FontSizeInputProps {
-  value: CSSProperties["fontSize"];
+  value?: CSSProperties["fontSize"];
   onChange: (value: string) => void;
 }
 

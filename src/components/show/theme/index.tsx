@@ -99,14 +99,19 @@ const ThemeEditor = () => {
 
   const onContainerLeftChange = useCallback(
     (left: number) => {
-      console.log(containerStyle);
-      setContainerStyle((cur) => ({ ...cur, left: `${left}%` }));
+      setContainerStyle((cur) => ({
+        ...cur,
+        left: `${left}%`,
+      }));
     },
     [containerStyle]
   );
 
   const onContainerTopChange = useCallback((top: number) => {
-    setContainerStyle((cur) => ({ ...cur, top: `${top}%` }));
+    setContainerStyle((cur) => ({
+      ...cur,
+      top: `${top}%`,
+    }));
   }, []);
 
   const onContainerWidthChange = useCallback((width: number) => {
