@@ -105,21 +105,22 @@ export type ThemeEntryStyleType = {
 };
 
 export type ThemeEntryContainerType = {
-  height: string;
-  width: string;
-  top: string;
-  left: string;
-  alignContent: string;
-  justifyContent: string;
-  display: string;
+  height: CSSProperties["height"];
+  width: CSSProperties["width"];
+  top: CSSProperties["top"];
+  left: CSSProperties["left"];
+  alignContent: CSSProperties["alignContent"];
+  justifyContent: CSSProperties["justifyContent"];
+  display: CSSProperties["display"];
+  textAlign: CSSProperties["textAlign"];
 };
 
 export type ThemeEntryTagType = {
-  top: string;
-  left: string;
-  fontSize: string;
-  fontFamily: string;
-  color: string;
+  top: CSSProperties["top"];
+  left: CSSProperties["left"];
+  fontSize: CSSProperties["fontSize"];
+  fontFamily: CSSProperties["fontFamily"];
+  color: CSSProperties["color"];
 };
 
 export type ThemeEntryStyleTypeKey = keyof ThemeEntryStyleType;
@@ -135,7 +136,7 @@ export type SearchEntryType = {
   tag?: string;
   extractor: {
     path?: string;
-    key?: string;
+    keys?: string[];
     type: string;
     url?: string;
     headers?: string;
@@ -162,4 +163,5 @@ export type SearchValidator = {
   minLength?: number;
   identifier?: string;
   tag?: string;
+  default?: string;
 };

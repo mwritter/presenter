@@ -15,11 +15,11 @@ const ThemeContainerEditSection = ({
   onContainerWidthChange,
   onContainerHeightChange,
 }: ThemeContainerEditSectionProps) => {
-  const { height, width, left, top } = containerStyle;
-  const heightValue = +height.split("%")[0];
-  const widthValue = +width.split("%")[0];
-  const leftValue = +left.split("%")[0];
-  const topValue = +top.split("%")[0];
+  const { height = 0, width = 0, left = 0, top = 0 } = containerStyle || {};
+  const heightValue = +height?.toString()?.split("%")[0];
+  const widthValue = +width?.toString().split("%")[0];
+  const leftValue = +left?.toString().split("%")[0];
+  const topValue = +top?.toString().split("%")[0];
   return (
     <ThemeToolbarSection>
       <Title order={6} color="white">
@@ -62,7 +62,7 @@ const ThemeContainerEditSection = ({
 };
 
 interface ThemeContainerEditSectionProps {
-  containerStyle: ThemeEntryContainerType;
+  containerStyle?: ThemeEntryContainerType;
   onContainerLeftChange: (value: number) => void;
   onContainerTopChange: (value: number) => void;
   onContainerWidthChange: (value: number) => void;

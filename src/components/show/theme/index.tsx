@@ -1,20 +1,17 @@
 import styled from "@emotion/styled";
-import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import ThemeFontEditSection from "./toolbar/font";
 import ThemeStage from "./stage";
 import useStore from "../../../store";
 import {
+  ThemeEntryContainerType,
   ThemeEntryContainerTypeKey,
   ThemeEntryStyleTypeKey,
   ThemeEntryTagType,
 } from "../../../types/LibraryTypes";
 import ThemeControls from "./controls";
-import { Select, TextInput } from "@mantine/core";
 import { getMediaDirContents } from "../../../helpers/media.helper";
-import BackgroundPickerSelect from "./toolbar/background/BackgroundPickerSelect";
-import { convertFileSrc } from "@tauri-apps/api/tauri";
-import { open } from "@tauri-apps/api/shell";
 import ThemeBackgroundEditSection from "./toolbar/background";
 import ThemeContainerEditSection from "./toolbar/container";
 import ThemeTagEditSection from "./toolbar/tag";
@@ -64,14 +61,14 @@ const DEFAULT_CONTAINER_VALUES: Record<ThemeEntryContainerTypeKey, string> = {
   width: "",
   top: "0",
   left: "0",
+  textAlign: "start",
 };
 
 const ThemeEditor = () => {
   const [selectedStyle, setSelectedStyle] =
     useState<Record<ThemeEntryStyleTypeKey, string>>(DEFAULT_VALUES);
-  const [containerStyle, setContainerStyle] = useState<
-    Record<ThemeEntryContainerTypeKey, string>
-  >(DEFAULT_CONTAINER_VALUES);
+  const [containerStyle, setContainerStyle] =
+    useState<ThemeEntryContainerType>();
   const [tagStyle, setTagStyle] = useState<ThemeEntryTagType>();
   const [tagText, setTagText] = useState<string>("Tag Text");
 
@@ -86,12 +83,16 @@ const ThemeEditor = () => {
 
   const onVerticalAlignmentChange = useCallback(
     (alignContent: string) =>
-      setContainerStyle((cur) => ({ ...cur, alignContent })),
+      setContainerStyle(
+        (cur) => ({ ...cur, alignContent } as ThemeEntryContainerType)
+      ),
     []
   );
 
   const onHorizontalAlignmentChange = useCallback((justifyContent: string) => {
-    setContainerStyle((cur) => ({ ...cur, justifyContent }));
+    setContainerStyle(
+      (cur) => ({ ...cur, justifyContent } as ThemeEntryContainerType)
+    );
   }, []);
 
   const onFontSizeChange = useCallback(
@@ -103,29 +104,51 @@ const ThemeEditor = () => {
     []
   );
 
+  const onTextAlinmentChange = useCallback(
+    (textAlign: string) =>
+      setContainerStyle(
+        (cur) =>
+          ({
+            ...cur,
+            textAlign,
+          } as ThemeEntryContainerType)
+      ),
+    []
+  );
+
   const onContainerLeftChange = useCallback(
     (left: number) => {
-      setContainerStyle((cur) => ({
-        ...cur,
-        left: `${left}%`,
-      }));
+      setContainerStyle(
+        (cur) =>
+          ({
+            ...cur,
+            left: `${left}%`,
+          } as ThemeEntryContainerType)
+      );
     },
     [containerStyle]
   );
 
   const onContainerTopChange = useCallback((top: number) => {
-    setContainerStyle((cur) => ({
-      ...cur,
-      top: `${top}%`,
-    }));
+    setContainerStyle(
+      (cur) =>
+        ({
+          ...cur,
+          top: `${top}%`,
+        } as ThemeEntryContainerType)
+    );
   }, []);
 
   const onContainerWidthChange = useCallback((width: number) => {
-    setContainerStyle((cur) => ({ ...cur, width: `${width}%` }));
+    setContainerStyle(
+      (cur) => ({ ...cur, width: `${width}%` } as ThemeEntryContainerType)
+    );
   }, []);
 
   const onContainerHeightChange = useCallback((height: number) => {
-    setContainerStyle((cur) => ({ ...cur, height: `${height}%` }));
+    setContainerStyle(
+      (cur) => ({ ...cur, height: `${height}%` } as ThemeEntryContainerType)
+    );
   }, []);
 
   const onBackgroundImageChange = useCallback((background: string) => {
@@ -184,6 +207,7 @@ const ThemeEditor = () => {
           onHorizontalAlignmentChange={onHorizontalAlignmentChange}
           onVerticalAlignmentChange={onVerticalAlignmentChange}
           onFontSizeChange={onFontSizeChange}
+          onTextAlinmentChange={onTextAlinmentChange}
         />
         <ThemeContainerEditSection
           containerStyle={containerStyle}

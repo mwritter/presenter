@@ -42,7 +42,7 @@ const ThemeControls = ({
 interface ThemeControlsProps {
   theme: ThemeEntryType | null;
   selectedStyle: Record<string, string>;
-  containerStyle: ThemeEntryContainerType;
+  containerStyle?: ThemeEntryContainerType;
   tagStyle: ThemeEntryTagType;
 }
 

@@ -81,7 +81,7 @@ const ThemeStage = ({
 
 interface ThemeStageProps {
   selectedStyle: Record<string, string>;
-  containerStyle: ThemeEntryContainerType;
+  containerStyle?: ThemeEntryContainerType;
   tagStyle: ThemeEntryTagType;
   tagText?: string;
 }

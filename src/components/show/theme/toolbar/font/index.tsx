@@ -7,6 +7,7 @@ import {
   ThemeEntryContainerType,
   ThemeEntryStyleType,
 } from "../../../../../types/LibraryTypes";
+import FontTextAlignment from "./FontTextAlignment";
 
 const DEFAULT_VALUES = {
   fontFamily: "Arial",
@@ -28,6 +29,7 @@ const ThemeFontEditSection = ({
   onFontSizeChange,
   onHorizontalAlignmentChange,
   onVerticalAlignmentChange,
+  onTextAlinmentChange,
 }: ThemeFontEditSectionProps) => {
   return (
     <ThemeToolbarSection>
@@ -35,10 +37,14 @@ const ThemeFontEditSection = ({
         FONT
       </Title>
       <FontAlignment
-        vertical={containerStyle.alignContent}
-        horizontal={containerStyle.justifyContent}
+        vertical={containerStyle?.alignContent}
+        horizontal={containerStyle?.justifyContent}
         onHorizontalAlignmentChange={onHorizontalAlignmentChange}
         onVerticalAlignmentChange={onVerticalAlignmentChange}
+      />
+      <FontTextAlignment
+        textAlign={containerStyle?.textAlign}
+        onChange={onTextAlinmentChange}
       />
       <FontFamilySelect
         value={selectedStyle.fontFamily}
@@ -54,11 +60,12 @@ const ThemeFontEditSection = ({
 
 interface ThemeFontEditSectionProps {
   selectedStyle: ThemeEntryStyleType;
-  containerStyle: ThemeEntryContainerType;
+  containerStyle?: ThemeEntryContainerType;
   onHorizontalAlignmentChange: (value: string) => void;
   onVerticalAlignmentChange: (value: string) => void;
   onFontFamilySelectChange: (value: string) => void;
   onFontSizeChange: (value: string) => void;
+  onTextAlinmentChange: (value: string) => void;
 }
 
 export default ThemeFontEditSection;

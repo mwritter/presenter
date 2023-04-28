@@ -10,7 +10,7 @@ import useStore from "../../store";
 import styled from "@emotion/styled";
 import {
   SearchEntryField,
-  ThemeEntryTagType,
+  SlideEntryType,
   ThemeEntryType,
 } from "../../types/LibraryTypes";
 import SearchAddPlaylistMenu from "./SearchAddPlaylistMenu";
@@ -40,33 +40,32 @@ const SearchResultControls = styled.div`
 `;
 
 const SearchView = ({ hidden }: { hidden: boolean }) => {
-  const [slides, setSlides] = useState<string[]>([]);
+  const [slides, setSlides] = useState<SlideEntryType[]>([]);
   const [query, setQuery] = useState<Record<string, string>>({});
   const [theme, setTheme] = useState<ThemeEntryType>();
   const [errorField, setErrorField] = useState<string | null>(null);
   const [latestRunQuery, setLatestRunQuery] =
     useState<Record<string, string>>();
+  const [isLoading, setIsLoading] = useState(false);
   const { search, themes } = useStore(({ search, themes }) => ({
     search,
     themes,
   }));
 
-  const getTag = useCallback(
-    (index?: number) => {
-      if (latestRunQuery) {
-        return (
-          parseSearchTag(parseSearchIdentifier(latestRunQuery)[1], index) || ""
-        );
-      }
-      return "";
-    },
-    [latestRunQuery]
-  );
   const runQuery = useCallback(async () => {
+    setIsLoading(true);
     _runQuery(query)
       .then((res) => {
         if (res?.text instanceof Array) {
-          setSlides(res.text);
+          const [, parsedTag] = query ? parseSearchIdentifier(query) : [];
+          console.log("ptag = ", parsedTag);
+          setSlides(
+            res.text.map((t, idx) => ({
+              id: `slide-${idx}`,
+              text: t,
+              tag: parsedTag ? parseSearchTag(parsedTag, idx) : "",
+            }))
+          );
           setLatestRunQuery(res.query);
         }
         if (res.errorField) {
@@ -75,8 +74,11 @@ const SearchView = ({ hidden }: { hidden: boolean }) => {
           setErrorField(null);
         }
       })
-      .catch(() => setLatestRunQuery(query));
-  }, [query]);
+      .catch(() => setLatestRunQuery(query))
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [query, latestRunQuery]);
 
   const onFeildChange = useCallback(
     (field: SearchEntryField, value: string) => {
@@ -125,6 +127,7 @@ const SearchView = ({ hidden }: { hidden: boolean }) => {
           onFeildChange={onFeildChange}
           onRunQuery={runQuery}
           errorField={errorField}
+          disabled={isLoading}
         />
 
         <SearchGrid
@@ -132,7 +135,7 @@ const SearchView = ({ hidden }: { hidden: boolean }) => {
           theme={theme?.name || "default"}
           search={search}
           query={latestRunQuery}
-          onGetTag={getTag}
+          isLoading={isLoading}
         />
         <SearchResultControls>
           {slides.length ? (
@@ -140,7 +143,7 @@ const SearchView = ({ hidden }: { hidden: boolean }) => {
               disabled={false}
               onPlaylistSelect={(playlistName) => {
                 const [name, tag] = parseSearchIdentifier(query);
-                let content = slides;
+                let content = slides.map((slide) => slide.text || "");
                 addSearchContent(playlistName, {
                   name,
                   tag,

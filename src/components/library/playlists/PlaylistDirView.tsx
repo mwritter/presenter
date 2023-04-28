@@ -86,6 +86,7 @@ const PlaylistDirView = () => {
                 <DndListHandle
                   data={playlist.content}
                   onReorder={(content) => {
+                    console.log("here");
                     playlist.content = content;
                     write(playlist.name, playlist);
                   }}

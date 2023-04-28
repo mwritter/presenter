@@ -8,26 +8,22 @@ import {
 } from "@tauri-apps/api/fs";
 import useStore from "../store";
 import { SearchEntryType } from "../types/LibraryTypes";
-import { Command } from "@tauri-apps/api/shell";
+import { fetch } from "@tauri-apps/api/http";
 
 export const getSearchEntries = async () => {
-  const hasPlaylist = await exists("playlists", { dir: BaseDirectory.AppData });
-  if (!hasPlaylist) {
+  const hasSearch = await exists("search", { dir: BaseDirectory.AppData });
+  if (!hasSearch) {
     await createDir("search", { dir: BaseDirectory.AppData });
     await writeTextFile("search/index.json", "[]", {
       dir: BaseDirectory.AppData,
     });
   }
-  // const contents = await readDir("search", {
-  //   dir: BaseDirectory.AppData,
-  //   recursive: true,
-  // });
+
   const outlineString = await readTextFile("search/index.json", {
     dir: BaseDirectory.AppData,
   });
   const outline: SearchEntryType[] = JSON.parse(outlineString);
 
-  // Only reture directories we have search outlines for
   useStore.getState().setSearchEntries(outline);
 };
 
@@ -50,146 +46,77 @@ export const queryAPI = async (query: Record<string, string>) => {
   const validatedQuery = await validateSearchQuery(query);
   if (validatedQuery.issue) {
     console.log("issue with: ", validatedQuery.issue);
-    return { text: [], query: validatedQuery.query };
+    return {
+      text: [],
+      query: validatedQuery.query,
+      errorField: validatedQuery.issue,
+    };
   }
   const {
-    extractor: { headers, url, key = "" },
+    extractor: { headers = "", url, keys = [] },
   } = search;
   if (!url) return { text: [], query: validatedQuery.query };
   let parsePath = url;
-  let parseKey = key;
+  let parseKeys = keys;
   for (const variable in query) {
-    parsePath = parsePath.replaceAll(`{{${variable}}}`, query[variable]);
-    parseKey = parseKey.replaceAll(`{{${variable}}}`, query[variable]);
+    parsePath = parsePath.replaceAll(`{{${variable}}}`, query[variable] || "");
+    parseKeys = parseKeys.map((key) =>
+      key.replaceAll(`{{${variable}}}`, query[variable] || "")
+    );
   }
   try {
-    const response = await fetch(parsePath, {
-      headers: JSON.parse(headers || ""),
+    const response = await fetch<any[] | any>(parsePath, {
+      method: "GET",
+      headers: headers ? JSON.parse(headers) : {},
     });
-    const { data } = await response.json();
-    return { text: data[parseKey], query: validatedQuery.query };
+    let extractedData = response.data;
+    if (extractedData instanceof Array) {
+      // if we get back and array from the api
+      // we assume, if the user didn't specifiy keys
+      // this is a text array
+      if (!keys.length) {
+        return { text: extractedData, query: validatedQuery.query };
+      } else {
+        // if the user specified keys we assume this is and object
+        // loop over each object and drill down into the object
+        // the last key should hold some text
+        extractedData = extractedData
+          .map((item) => {
+            for (const key of parseKeys) {
+              if (key in item) {
+                item = item[key];
+              } else {
+                console.log(`${key} not in ${item}`);
+                item = null;
+                break;
+              }
+            }
+            return item;
+          })
+          .filter((item) => item !== null && item !== undefined);
+        return { text: extractedData, query: validatedQuery.query };
+      }
+    } else {
+      // if we didn't get an array we assume this is an object
+      // drill down
+      if (!keys.length) return { text: [], query: validatedQuery.query };
+      for (const key of parseKeys) {
+        if (key in extractedData) {
+          extractedData = extractedData[key];
+        } else {
+          console.log(`${key} not in ${extractedData}`);
+          extractedData = [];
+          break;
+        }
+      }
+      return {
+        text: extractedData instanceof Array ? extractedData : [],
+        query: validatedQuery.query,
+      };
+    }
   } catch (e) {
     console.log(e);
     return { text: [], query: validatedQuery.query };
-  }
-};
-
-export const queryDirectory = async (
-  query: Record<string, string>
-): Promise<{ text: string[]; query: Record<string, string> }> => {
-  const search = useStore.getState().search;
-  if (!search) return { text: [], query };
-  const {
-    extractor: { path = "", key = "", type = "" },
-    validator,
-  } = search;
-
-  let parsePath = path;
-  let parseKey = key;
-  let issue = null;
-
-  for (let variable in query) {
-    if (validator) {
-      const valid = validator[variable];
-      if (valid) {
-        if (valid.required && (!(variable in query) || !query[variable])) {
-          issue = true;
-          break;
-        }
-        if (valid.minLength && query[variable].length < valid.minLength) {
-          issue = true;
-          break;
-        }
-        if (valid.pattern) {
-          const regex = new RegExp(valid.pattern);
-          if (!regex.test(query[variable])) {
-            console.log(`${variable} does not match ${valid.pattern}`);
-          }
-        }
-        if (valid.type) {
-          switch (valid.type) {
-            // is a file entry in the directory
-            case "entry": {
-              if (valid.path) {
-                const matches = valid.path.match(/(?<=\{\{).+?(?=\}\})/g) ?? [];
-                let entryPath = valid.path;
-                for (const match of matches) {
-                  entryPath = entryPath.replaceAll(
-                    `{{${match}}}`,
-                    query[match]
-                  );
-                }
-                try {
-                  const content = await readDir(
-                    `search/${search.directory}/${entryPath}`,
-                    { dir: BaseDirectory.AppData, recursive: true }
-                  );
-                  const found = content
-                    .map(({ name }) => name || "")
-                    .find((value) => {
-                      const regex = new RegExp(`^${query[variable]}`, "i");
-                      return regex.test(value);
-                    });
-                  if (found) {
-                    query[variable] = found.split(".")[0];
-                  }
-                } catch (e) {
-                  console.log(e);
-                }
-              }
-            }
-          }
-        } else if (valid.values) {
-          const found = valid.values.find((value) => {
-            const regex = new RegExp(`^${query[variable]}`, "i");
-            return regex.test(value);
-          });
-          if (found) {
-            query[variable] = found;
-          }
-        }
-      }
-    }
-    parsePath = parsePath.replaceAll(`{{${variable}}}`, query[variable]);
-    parseKey = parseKey.replaceAll(`{{${variable}}}`, query[variable]);
-  }
-
-  if (issue) {
-    return { text: [], query };
-  }
-
-  try {
-    const data = await readTextFile(
-      `search/${search?.directory}/${parsePath}`,
-      {
-        dir: BaseDirectory.AppData,
-      }
-    );
-    const parsed = JSON.parse(data);
-    const item: string | string[] = parsed[parseKey];
-    let parseItem: string[] = [];
-    if (item) {
-      switch (type) {
-        case "array": {
-          if (!(item instanceof Array)) return { text: [], query };
-          const { start, end } = query;
-          if (start && end) {
-            parseItem = item.slice(+start, +end + 1);
-          } else if (start) {
-            parseItem = [item[+start] || ""];
-          } else {
-            parseItem = item;
-          }
-          break;
-        }
-        default:
-          parseItem = item instanceof Array ? item : [item];
-      }
-    }
-    return { text: parseItem, query };
-  } catch (e) {
-    console.log(e);
-    return { text: [], query };
   }
 };
 
@@ -206,19 +133,23 @@ export const parseSearchIdentifier = (query: Record<string, string>) => {
     if (valid?.identifier && query[variable]) {
       parseIdentifier = parseIdentifier.concat(valid.identifier);
     }
-    if (valid?.tag && query[variable]) {
+    if (valid?.tag && (query[variable] || valid.default)) {
       parseTag = parseTag.concat(valid.tag);
     }
   }
 
   // replace variables
   for (const variable in query) {
+    const valid = validator[variable];
     parseIdentifier = parseIdentifier.replaceAll(
       `{{${variable}}}`,
       query[variable]
     );
     if (parseTag) {
-      parseTag = parseTag.replaceAll(`{{${variable}}}`, query[variable]);
+      parseTag = parseTag.replaceAll(
+        `{{${variable}}}`,
+        query[variable] || valid.default || ""
+      );
     }
   }
   return [parseIdentifier, parseTag];
@@ -229,9 +160,9 @@ export const parseSearchTag = (tag: string, index?: number) => {
   const search = useStore.getState().search;
   if (!search) return "";
 
-  const { extractor, validator } = search;
+  const { extractor } = search;
 
-  // if 'array' replace index
+  // if 'array' replace $index
   switch (extractor.type) {
     case "array": {
       parsedTag = parsedTag.replaceAll("$index", (index || 0).toString());
@@ -258,60 +189,7 @@ export const parseSearchTag = (tag: string, index?: number) => {
     }
     return parsedTag;
   }
-};
-
-export const queryPresenterCLI = async (
-  query: Record<string, string>
-): Promise<{
-  text: string[];
-  query: Record<string, string>;
-  errorMessage?: string;
-  errorField?: string;
-}> => {
-  const validatedQuery = await validateSearchQuery(query);
-  const search = useStore.getState().search;
-  console.log("Valid", validatedQuery);
-  if (validatedQuery.issue || !search) {
-    console.log("issue with: ", validatedQuery.issue || "no search outline");
-    return {
-      text: [],
-      query: validatedQuery.query,
-      errorField: validatedQuery.issue || "",
-      errorMessage: validatedQuery.issue ?? "",
-    };
-  }
-  const {
-    extractor: { args = "", cmd = "" },
-  } = search;
-  const value = JSON.stringify(query);
-  // args is the cmd arguments
-  // value is the search query JSON
-  // cmd is the actual commend that will be executed
-  // on your machine, make sure to have this command accessible globally on your machine 'presenter-cli'
-  const commandResult = await new Command("presenter-cli", [
-    ...args,
-    value,
-    cmd,
-  ]).execute();
-
-  if (commandResult.code !== 0) {
-    console.error(commandResult.stderr);
-    return { text: [], query: validatedQuery.query };
-  }
-
-  try {
-    const output: { error: string; text: string[] } = JSON.parse(
-      commandResult.stdout
-    );
-    if (output.error) {
-      console.error(output.error);
-      return { text: [], query: validatedQuery.query };
-    }
-    return { text: output.text, query: validatedQuery.query };
-  } catch (e) {
-    console.error(e);
-    return { text: [], query: validatedQuery.query };
-  }
+  return parsedTag;
 };
 
 export const runQuery = async (query: Record<string, string>) => {
@@ -326,12 +204,6 @@ export const runQuery = async (query: Record<string, string>) => {
   if (!search) return result;
 
   switch (search.type) {
-    case "directory":
-      result = await queryDirectory(query);
-      break;
-    case "presenter-cli":
-      result = await queryPresenterCLI(query);
-      break;
     case "api":
       result = await queryAPI(query);
       break;
@@ -344,87 +216,63 @@ const validateSearchQuery = async (query: Record<string, string>) => {
   const search = useStore.getState().search;
   if (!search) return { text: [], query };
   const {
-    extractor: { path = "", key = "", type = "" },
+    extractor: { path = "", keys = [] },
     validator,
   } = search;
 
   let parsePath = path;
-  let parseKey = key;
+  let parseKeys = keys;
   let issue = null;
 
   for (let variable in validator) {
     if (validator) {
       const valid = validator[variable];
       if (valid) {
-        console.log(variable);
-        console.log(valid);
+        // required
         if (valid.required && (!(variable in query) || !query[variable])) {
           issue = variable;
+          console.log(`${variable} not set but is required`);
           break;
         }
+        // minLength
         if (valid.minLength && query[variable].length < valid.minLength) {
           issue = variable;
+          console.log(`${variable} not long enought ${valid.minLength}`);
           break;
         }
+        // pattern
         if (valid.pattern) {
           const regex = new RegExp(valid.pattern);
           if (!regex.test(query[variable])) {
             console.log(`${variable} does not match ${valid.pattern}`);
           }
         }
-        if (valid.type) {
-          switch (valid.type) {
-            // is a file entry in the directory
-            // check the file names as valid values
-            case "entry": {
-              if (valid.path) {
-                const matches = valid.path.match(/(?<=\{\{).+?(?=\}\})/g) ?? [];
-                let entryPath = valid.path;
-                for (const match of matches) {
-                  entryPath = entryPath.replaceAll(
-                    `{{${match}}}`,
-                    query[match]
-                  );
-                }
-                try {
-                  const content = await readDir(
-                    `search/${search.directory}/${entryPath}`,
-                    { dir: BaseDirectory.AppData, recursive: true }
-                  );
-                  const found = content
-                    .map(({ name }) => name || "")
-                    .find((value) => {
-                      const regex = new RegExp(`^${query[variable]}`, "i");
-                      return regex.test(value);
-                    });
-                  if (found) {
-                    query[variable] = found.split(".")[0];
-                  }
-                } catch (e) {
-                  console.log(e);
-                }
-              }
-            }
-          }
-        } else if (valid.values) {
+        // values
+        if (valid.values) {
           const found = valid.values.find((value) => {
             const regex = new RegExp(`^${query[variable]}`, "i");
             return regex.test(value);
           });
           if (found) {
             query[variable] = found;
+          } else {
+            console.log(
+              `${variable} does not match any valid values ${valid.values}`
+            );
           }
         }
       }
     }
     parsePath = parsePath.replaceAll(`{{${variable}}}`, query[variable]);
-    parseKey = parseKey.replaceAll(`{{${variable}}}`, query[variable]);
+    parseKeys = parseKeys.map((key) =>
+      key.replaceAll(`{{${variable}}}`, query[variable])
+    );
   }
 
   return {
     query,
     parsePath,
-    parseKey,
+    parseKeys,
     issue,
   };
 };

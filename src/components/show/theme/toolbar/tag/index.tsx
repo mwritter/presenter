@@ -94,9 +94,8 @@ const ThemeTagEditSection = ({
         }}
       />
       <FontSizeInput
-        value={tagStyle?.fontSize?.split("px")[0] || 0}
+        value={tagStyle?.fontSize?.toString().split("px")[0] || 0}
         onChange={(value) => {
-          console.log(value);
           onSetTagStyle({ fontSize: `${value}px` });
         }}
       />
@@ -114,7 +113,7 @@ const ThemeTagEditSection = ({
           Top
         </Text>
         <Slider
-          value={+(tagStyle?.top?.split("%")[0] || 50)}
+          value={+(tagStyle?.top?.toString().split("%")[0] || 50)}
           onChange={(value) => {
             const top = `${value}%`;
             onSetTagStyle({ top });
@@ -126,7 +125,7 @@ const ThemeTagEditSection = ({
           Left
         </Text>
         <Slider
-          value={+(tagStyle?.left?.split("%")[0] || 50)}
+          value={+(tagStyle?.left?.toString().split("%")[0] || 50)}
           onChange={(value) => {
             const left = `${value}%`;
             onSetTagStyle({ left });

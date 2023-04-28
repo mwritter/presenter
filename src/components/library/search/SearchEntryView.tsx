@@ -57,7 +57,7 @@ const SearchEntryView = () => {
   useEffect(() => {
     getSearchEntries();
   }, []);
-  // TODO: add a segment control for directory vs api search
+
   return (
     <SearchDirContainer>
       <SearchHeaderContainer>

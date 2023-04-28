@@ -1,5 +1,14 @@
 import styled from "@emotion/styled";
-import { Button, Group, Select, Stack, Text, TextInput } from "@mantine/core";
+import {
+  Autocomplete,
+  Button,
+  Group,
+  LoadingOverlay,
+  Select,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import {
   SearchEntryField,
   SearchEntryType,
@@ -32,18 +41,18 @@ const SearchControlsStyled = styled.div`
   width: 100%;
 `;
 
-const SearchSelect = styled(Select)`
+const SearchSelect = styled(Autocomplete)`
   & .mantine-Input-input {
     color: white;
     background-color: #282c34;
   }
 
-  & .mantine-Select-label {
+  & .mantine-Autocomplete-label {
     color: white;
     font-size: smaller;
   }
 
-  & .mantine-Select-item {
+  & .mantine-Autocomplete-item {
     color: white;
     margin: 0.1rem;
     font-size: small;
@@ -53,7 +62,7 @@ const SearchSelect = styled(Select)`
     }
   }
 
-  & .mantine-Select-dropdown {
+  & .mantine-Autocomplete-dropdown {
     background-color: #282c34;
   }
 `;
@@ -69,6 +78,7 @@ const SearchControls = ({
   query,
   onRunQuery,
   errorField,
+  disabled,
 }: SearchControlsProps) => {
   return (
     <SearchControlsContainer>
@@ -80,6 +90,7 @@ const SearchControls = ({
               case "input":
                 return (
                   <TextInputStyled
+                    disabled={disabled}
                     key={name + "-input"}
                     error={
                       errorField && variables.includes(errorField)
@@ -97,7 +108,8 @@ const SearchControls = ({
               case "select": {
                 return (
                   <SearchSelect
-                    searchable
+                    disabled={disabled}
+                    autoComplete="false"
                     error={
                       errorField && variables.includes(errorField)
                         ? errorField
@@ -108,7 +120,6 @@ const SearchControls = ({
                     data={data || []}
                     value={query ? query[name] : ""}
                     onChange={(value) => {
-                      if (!value) return;
                       onFeildChange(field, value);
                     }}
                   />
@@ -140,6 +151,7 @@ const SearchControls = ({
         {search && !search.fields.find((f) => f.type === "api") && (
           <Stack style={{ flexDirection: "row", alignItems: "end" }}>
             <SearchSelect
+              disabled={disabled}
               label="Theme"
               value={theme?.name}
               data={themes.map(({ name }) => ({ value: name, label: name }))}
@@ -150,7 +162,20 @@ const SearchControls = ({
                 }
               }}
             />
-            <Button onClick={onRunQuery}>Search</Button>
+            <Button disabled={disabled} onClick={onRunQuery}>
+              <>
+                <LoadingOverlay
+                  visible={disabled}
+                  exitTransitionDuration={250}
+                  overlayOpacity={0.1}
+                  transitionDuration={250}
+                  overlayBlur={1}
+                  overlayColor="black"
+                  loaderProps={{ color: "white", size: "xs" }}
+                />
+                Search
+              </>
+            </Button>
           </Stack>
         )}
       </SystemControls>
@@ -167,6 +192,7 @@ interface SearchControlsProps {
   query?: Record<string, string>;
   onRunQuery: () => void;
   errorField: string | null;
+  disabled: boolean;
 }
 
 export default SearchControls;

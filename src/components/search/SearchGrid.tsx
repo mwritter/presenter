@@ -1,12 +1,13 @@
 import styled from "@emotion/styled";
-import { Center, Text } from "@mantine/core";
-import React from "react";
+import { Center, LoadingOverlay, Text } from "@mantine/core";
 import Slide from "../show/slide/Slide";
-import { SearchEntryType, ThemeEntryTagType } from "../../types/LibraryTypes";
+import { SearchEntryType, SlideEntryType } from "../../types/LibraryTypes";
 
 const SearchGridContainer = styled.div`
   grid-area: results;
+  position: relative;
   display: grid;
+  padding: 2rem 0;
   width: 100%;
   height: 100%;
   grid-template-columns: repeat(auto-fill, 350px);
@@ -22,7 +23,7 @@ const SearchGrid = ({
   theme,
   search,
   query,
-  onGetTag,
+  isLoading,
 }: SearchGridProps) => {
   return (
     <SearchGridContainer>
@@ -32,17 +33,13 @@ const SearchGrid = ({
               index={idx}
               theme={theme}
               key={idx}
-              slide={{
-                id: `slide-${idx}`,
-                text: slide,
-                tag: onGetTag(idx),
-              }}
+              slide={slide}
               size={350}
             />
           ))
         : search &&
           query && (
-            <Center>
+            <Center style={{ gridColumn: "1 / -1", placeSelf: "center" }}>
               <Text color="white">No items to display</Text>
             </Center>
           )}
@@ -51,11 +48,11 @@ const SearchGrid = ({
 };
 
 interface SearchGridProps {
-  slides: string[];
+  slides: SlideEntryType[];
   theme: string;
   search: SearchEntryType | null;
   query?: Record<string, string>;
-  onGetTag: (index: number) => string;
+  isLoading: boolean;
 }
 
 export default SearchGrid;

@@ -24,6 +24,24 @@ const ShowViewControls = styled.div`
 
 const GridItemSizeControl = styled(Slider)<SliderProps>`
   width: 200px;
+
+  .mantine-Slider-thumb {
+    background-color: black;
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid white;
+  }
+
+  .mantine-Slider-track {
+    &:before {
+      opacity: 0.5;
+    }
+  }
+
+  .mantine-Slider-bar {
+    background-color: white;
+    opacity: 0.5;
+  }
 `;
 
 const ShowView = () => {
