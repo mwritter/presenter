@@ -18,13 +18,7 @@ const SearchGridContainer = styled.div`
   overflow-y: scroll;
 `;
 
-const SearchGrid = ({
-  slides,
-  theme,
-  search,
-  query,
-  isLoading,
-}: SearchGridProps) => {
+const SearchGrid = ({ slides, theme, search, query }: SearchGridProps) => {
   return (
     <SearchGridContainer>
       {slides.length

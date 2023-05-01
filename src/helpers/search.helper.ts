@@ -2,7 +2,6 @@ import {
   BaseDirectory,
   createDir,
   exists,
-  readDir,
   readTextFile,
   writeTextFile,
 } from "@tauri-apps/api/fs";
@@ -25,6 +24,40 @@ export const getSearchEntries = async () => {
   const outline: SearchEntryType[] = JSON.parse(outlineString);
 
   useStore.getState().setSearchEntries(outline);
+};
+
+export const write = async (searchOutline: SearchEntryType[]) => {
+  const content = JSON.stringify(searchOutline);
+  await writeTextFile(`search/index.json`, content, {
+    dir: BaseDirectory.AppData,
+  });
+  await getSearchEntries();
+};
+
+export const createNewSearchEntry = async (name: string) => {
+  // get the search json and parse
+  const outlineString = await readTextFile("search/index.json", {
+    dir: BaseDirectory.AppData,
+  });
+  const searchOutline: SearchEntryType[] = JSON.parse(outlineString);
+
+  // add a new empty item to the array
+  const newSearch: SearchEntryType = {
+    name,
+    type: "api", // hard coded for now
+    identifier: "",
+    tag: "",
+    fields: [],
+    extractor: {},
+    validator: {},
+  };
+
+  searchOutline.push(newSearch);
+  await write(searchOutline);
+
+  // select this new item
+  useStore.getState().setSearch(newSearch);
+  useStore.getState().setSearchEditMode(newSearch.name);
 };
 
 export const setSearchEntry = async (entry: SearchEntryType) => {

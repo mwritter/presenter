@@ -130,14 +130,13 @@ export type ThemeEntryTagTypeKey = keyof ThemeEntryTagType;
 export type SearchEntryType = {
   name: string;
   type: string;
-  directory?: string;
   identifier: string;
   fields: SearchEntryField[];
   tag?: string;
   extractor: {
     path?: string;
     keys?: string[];
-    type: string;
+    type?: string;
     url?: string;
     headers?: string;
     args?: string[];

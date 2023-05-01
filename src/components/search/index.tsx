@@ -5,7 +5,7 @@ import {
   runQuery as _runQuery,
   getSearchEntries,
 } from "../../helpers/search.helper";
-import { Box } from "@mantine/core";
+import { ActionIcon, Box } from "@mantine/core";
 import useStore from "../../store";
 import styled from "@emotion/styled";
 import {
@@ -18,6 +18,8 @@ import { addSearchContent } from "../../helpers/playlist.helper";
 import SearchGrid from "./SearchGrid";
 import SearchControls from "./SearchControls";
 import { getThemeEnties } from "../../helpers/theme.helper";
+import { IconEdit } from "@tabler/icons-react";
+import SearchEdit from "./edit";
 
 const SearchContainer = styled.div`
   display: grid;
@@ -25,14 +27,13 @@ const SearchContainer = styled.div`
     "actionmenu"
     "controls"
     "results";
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
   grid-template-rows: auto auto 1fr;
   height: 100%;
   width: 100%;
-  overflow: hidden;
 `;
 
-const SearchResultControls = styled.div`
+const SearchBarControls = styled.div`
   grid-area: actionmenu;
   background-color: #21212a;
   width: 100%;
@@ -47,10 +48,14 @@ const SearchView = ({ hidden }: { hidden: boolean }) => {
   const [latestRunQuery, setLatestRunQuery] =
     useState<Record<string, string>>();
   const [isLoading, setIsLoading] = useState(false);
-  const { search, themes } = useStore(({ search, themes }) => ({
-    search,
-    themes,
-  }));
+  const { search, searchEditMode, setSearchEditMode, themes } = useStore(
+    ({ search, searchEditMode, setSearchEditMode, themes }) => ({
+      search,
+      searchEditMode,
+      setSearchEditMode,
+      themes,
+    })
+  );
 
   const runQuery = useCallback(async () => {
     setIsLoading(true);
@@ -118,26 +123,48 @@ const SearchView = ({ hidden }: { hidden: boolean }) => {
   return (
     <Box hidden={hidden} w={"100%"} h={"100%"}>
       <SearchContainer>
-        <SearchControls
-          search={search}
-          query={query}
-          themes={themes}
-          theme={theme}
-          onSetTheme={setTheme}
-          onFeildChange={onFeildChange}
-          onRunQuery={runQuery}
-          errorField={errorField}
-          disabled={isLoading}
-        />
+        {searchEditMode !== search?.name && (
+          <SearchControls
+            search={search}
+            query={query}
+            themes={themes}
+            theme={theme}
+            onSetTheme={setTheme}
+            onFeildChange={onFeildChange}
+            onRunQuery={runQuery}
+            errorField={errorField}
+            disabled={isLoading}
+            editMode={searchEditMode === search?.name}
+          />
+        )}
 
-        <SearchGrid
-          slides={slides}
-          theme={theme?.name || "default"}
-          search={search}
-          query={latestRunQuery}
-          isLoading={isLoading}
-        />
-        <SearchResultControls>
+        {searchEditMode === search?.name ? (
+          <SearchEdit />
+        ) : (
+          <SearchGrid
+            slides={slides}
+            theme={theme?.name || "default"}
+            search={search}
+            query={latestRunQuery}
+            isLoading={isLoading}
+          />
+        )}
+
+        <SearchBarControls>
+          {search && (
+            <ActionIcon
+              variant="transparent"
+              onClick={() => {
+                if (searchEditMode !== search.name) {
+                  setSearchEditMode(search.name);
+                } else {
+                  setSearchEditMode(null);
+                }
+              }}
+            >
+              <IconEdit size={14} />
+            </ActionIcon>
+          )}
           {slides.length ? (
             <SearchAddPlaylistMenu
               disabled={false}
@@ -152,7 +179,7 @@ const SearchView = ({ hidden }: { hidden: boolean }) => {
               }}
             />
           ) : null}
-        </SearchResultControls>
+        </SearchBarControls>
       </SearchContainer>
     </Box>
   );

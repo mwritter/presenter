@@ -4,7 +4,6 @@ import {
   Button,
   Group,
   LoadingOverlay,
-  Select,
   Stack,
   Text,
   TextInput,
@@ -25,13 +24,15 @@ const TextInputStyled = styled(TextInput)`
   }
 `;
 
-const SearchControlsContainer = styled.div`
-  grid-area: controls;
+const SearchControlsContainer = styled.div<SearchControlsContainerProps>`
+  grid-area: ${(p) => (p.editMode ? "" : "controls")};
   display: flex;
   flex-direction: column;
   align-items: start;
+  overflow-x: hidden;
   gap: 1rem;
   padding: 1rem;
+  border: ${(p) => (p.editMode ? "1px solid white" : "none")};
 `;
 
 const SearchControlsStyled = styled.div`
@@ -79,9 +80,10 @@ const SearchControls = ({
   onRunQuery,
   errorField,
   disabled,
+  editMode,
 }: SearchControlsProps) => {
   return (
-    <SearchControlsContainer>
+    <SearchControlsContainer editMode={editMode}>
       <SearchControlsStyled>
         {search &&
           search?.fields.map((field) => {
@@ -90,7 +92,7 @@ const SearchControls = ({
               case "input":
                 return (
                   <TextInputStyled
-                    disabled={disabled}
+                    disabled={disabled || editMode}
                     key={name + "-input"}
                     error={
                       errorField && variables.includes(errorField)
@@ -101,14 +103,14 @@ const SearchControls = ({
                     value={query ? query[name] : ""}
                     onChange={(evt) => {
                       const value = evt.currentTarget?.value || "";
-                      onFeildChange(field, value);
+                      onFeildChange?.(field, value);
                     }}
                   />
                 );
               case "select": {
                 return (
                   <SearchSelect
-                    disabled={disabled}
+                    disabled={disabled || editMode}
                     autoComplete="false"
                     error={
                       errorField && variables.includes(errorField)
@@ -120,7 +122,7 @@ const SearchControls = ({
                     data={data || []}
                     value={query ? query[name] : ""}
                     onChange={(value) => {
-                      onFeildChange(field, value);
+                      onFeildChange?.(field, value);
                     }}
                   />
                 );
@@ -128,7 +130,7 @@ const SearchControls = ({
             }
           })}
       </SearchControlsStyled>
-      {query && search && (
+      {query && search && !editMode && (
         <>
           <Group style={{ gap: "1rem" }}>
             <Text size="xs" color="white" mr={5}>
@@ -148,24 +150,26 @@ const SearchControls = ({
         </>
       )}
       <SystemControls>
-        {search && !search.fields.find((f) => f.type === "api") && (
+        {search && !editMode && (
           <Stack style={{ flexDirection: "row", alignItems: "end" }}>
             <SearchSelect
               disabled={disabled}
               label="Theme"
               value={theme?.name}
-              data={themes.map(({ name }) => ({ value: name, label: name }))}
+              data={
+                themes?.map(({ name }) => ({ value: name, label: name })) || []
+              }
               onChange={(value) => {
-                const found = themes.find(({ name }) => name === value);
+                const found = themes?.find(({ name }) => name === value);
                 if (found) {
-                  onSetTheme(found);
+                  onSetTheme?.(found);
                 }
               }}
             />
             <Button disabled={disabled} onClick={onRunQuery}>
               <>
                 <LoadingOverlay
-                  visible={disabled}
+                  visible={disabled || false}
                   exitTransitionDuration={250}
                   overlayOpacity={0.1}
                   transitionDuration={250}
@@ -186,13 +190,18 @@ const SearchControls = ({
 interface SearchControlsProps {
   search: SearchEntryType | null;
   theme?: ThemeEntryType;
-  themes: ThemeEntryType[];
-  onSetTheme: (theme: ThemeEntryType) => void;
-  onFeildChange: (feild: SearchEntryField, value: string) => void;
+  themes?: ThemeEntryType[];
+  onSetTheme?: (theme: ThemeEntryType) => void;
+  onFeildChange?: (feild: SearchEntryField, value: string) => void;
   query?: Record<string, string>;
-  onRunQuery: () => void;
-  errorField: string | null;
-  disabled: boolean;
+  onRunQuery?: () => void;
+  errorField?: string | null;
+  disabled?: boolean;
+  editMode: boolean;
+}
+
+interface SearchControlsContainerProps {
+  editMode: boolean;
 }
 
 export default SearchControls;

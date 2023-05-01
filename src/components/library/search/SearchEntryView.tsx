@@ -5,9 +5,11 @@ import { IconPlus } from "@tabler/icons-react";
 import { SearchEntryType } from "../../../types/LibraryTypes";
 import useStore from "../../../store";
 import {
+  createNewSearchEntry,
   getSearchEntries,
   setSearchEntry,
 } from "../../../helpers/search.helper";
+import SearchAddInput from "./SearchAddInput";
 
 const SearchDirContainer = styled.section``;
 
@@ -49,6 +51,7 @@ const ScrollableList = styled.div`
 `;
 
 const SearchEntryView = () => {
+  const [addNewSearch, setAddNewSearch] = useState(false);
   const { searchEntries, search } = useStore(({ searchEntries, search }) => ({
     searchEntries,
     search,
@@ -62,10 +65,23 @@ const SearchEntryView = () => {
     <SearchDirContainer>
       <SearchHeaderContainer>
         <SearchDirTitle order={6}>SEARCH</SearchDirTitle>
-        <ActionIcon onClick={() => {}}>
+        <ActionIcon
+          onClick={() => {
+            setAddNewSearch(true);
+          }}
+        >
           <IconPlus size={16} />
         </ActionIcon>
       </SearchHeaderContainer>
+      {addNewSearch && (
+        <SearchAddInput
+          onClose={() => setAddNewSearch(false)}
+          onEnter={(value) => {
+            createNewSearchEntry(value);
+            setAddNewSearch(false);
+          }}
+        />
+      )}
       <ScrollableList>
         {searchEntries.map((entry) => {
           return (
