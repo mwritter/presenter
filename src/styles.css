@@ -47,3 +47,18 @@ body,
   padding: 0.5rem;
   border-radius: 5px;
 }
+
+/* URL Variable */
+
+.url-variable {
+  color: rgb(116, 38, 38);
+  background-color: rgb(197, 197, 197);
+  font-weight: bold;
+  font-family: monospace;
+  font-size: small;
+  padding: 0.2rem;
+  margin: 0 0.2rem;
+  border-radius: 5px;
+  box-shadow: 3px 3px 2px 1px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}

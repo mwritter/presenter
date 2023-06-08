@@ -26,6 +26,22 @@ export const getSearchEntries = async () => {
   useStore.getState().setSearchEntries(outline);
 };
 
+export const editSearchEntry = async (content: SearchEntryType) => {
+  const searchEntries = useStore.getState().searchEntries;
+  if (!searchEntries) return;
+  const found = searchEntries.findIndex((entry) => entry.name === content.name);
+  console.log(found);
+  if (found > -1) {
+    console.log({ content });
+    const newSearchEntries = [...searchEntries];
+    newSearchEntries[found] = content;
+    console.log({ newSearchEntries });
+    await write(newSearchEntries);
+    await getSearchEntries();
+    useStore.getState().setSearch(content);
+  }
+};
+
 export const write = async (searchOutline: SearchEntryType[]) => {
   const content = JSON.stringify(searchOutline);
   await writeTextFile(`search/index.json`, content, {
@@ -76,6 +92,7 @@ export const setSearchEntry = async (entry: SearchEntryType) => {
 export const queryAPI = async (query: Record<string, string>) => {
   const search = useStore.getState().search;
   if (!search) return { text: [], query };
+  console.log(query);
   const validatedQuery = await validateSearchQuery(query);
   if (validatedQuery.issue) {
     console.log("issue with: ", validatedQuery.issue);
@@ -103,6 +120,7 @@ export const queryAPI = async (query: Record<string, string>) => {
       headers: headers ? JSON.parse(headers) : {},
     });
     let extractedData = response.data;
+    console.log(extractedData);
     if (extractedData instanceof Array) {
       // if we get back and array from the api
       // we assume, if the user didn't specifiy keys
@@ -130,22 +148,7 @@ export const queryAPI = async (query: Record<string, string>) => {
         return { text: extractedData, query: validatedQuery.query };
       }
     } else {
-      // if we didn't get an array we assume this is an object
-      // drill down
-      if (!keys.length) return { text: [], query: validatedQuery.query };
-      for (const key of parseKeys) {
-        if (key in extractedData) {
-          extractedData = extractedData[key];
-        } else {
-          console.log(`${key} not in ${extractedData}`);
-          extractedData = [];
-          break;
-        }
-      }
-      return {
-        text: extractedData instanceof Array ? extractedData : [],
-        query: validatedQuery.query,
-      };
+      throw Error("No supported response type.  The API must return an array");
     }
   } catch (e) {
     console.log(e);

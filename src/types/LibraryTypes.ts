@@ -138,6 +138,7 @@ export type SearchEntryType = {
     keys?: string[];
     type?: string;
     url?: string;
+    urlJSON?: string;
     headers?: string;
     args?: string[];
     cmd?: string;

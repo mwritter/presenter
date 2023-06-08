@@ -12,9 +12,11 @@ import {
 } from "@mantine/core";
 import SearchControls from "../SearchControls";
 import { useCallback, useEffect, useState } from "react";
-import { SearchEntryType } from "../../../types/LibraryTypes";
+import { SearchEntryField, SearchEntryType } from "../../../types/LibraryTypes";
 import SearchEditHeaders from "./SearchEditHeaders";
 import SearchEditURL from "./SearchEditURL";
+import { editSearchEntry } from "../../../helpers/search.helper";
+import SearchEditFieldModal from "./SearchEditFieldModal";
 
 const SearchCreateContainer = styled.div`
   grid-area: results;
@@ -72,30 +74,65 @@ const SearchSelect = styled(Select)`
 
 const SearchEdit = () => {
   const { search } = useStore(({ search }) => ({ search }));
+  const [editField, setEditField] = useState<SearchEntryField>();
   const [searchState, setSearchState] = useState<SearchEntryType>();
   const [parsedHeaders, setParsedHeaders] = useState<Record<string, string>>(
     {}
   );
   const [urlState, setURLState] = useState({
-    editing: false,
     url: "",
+    urlJSON: "",
   });
 
   const onHeaderChange = useCallback((headers: Record<string, string>) => {
     setParsedHeaders(headers);
   }, []);
 
+  const onURLChange = useCallback((url: string, urlJSON: string) => {
+    setURLState((cur) => ({ ...cur, url, urlJSON }));
+  }, []);
+
+  useEffect(() => {
+    setSearchState((cur) => {
+      const newHeaders = JSON.stringify(parsedHeaders);
+      let { url, urlJSON, headers } = searchState?.extractor || {};
+      if (urlState.url !== url) {
+        url = urlState.url;
+      }
+
+      if (urlState.urlJSON !== urlJSON) {
+        urlJSON = urlState.urlJSON;
+      }
+
+      if (newHeaders !== headers) {
+        headers = newHeaders;
+      }
+
+      return {
+        ...cur,
+        extractor: { ...cur?.extractor, headers, url, urlJSON },
+      } as SearchEntryType;
+    });
+  }, [urlState.url, urlState.urlJSON, parsedHeaders]);
+
   useEffect(() => {
     if (search) {
       setSearchState(search);
-      const { headers, url } = search.extractor;
+      const { headers, url, urlJSON } = search.extractor;
       if (headers) {
         const parsed = JSON.parse(headers);
         setParsedHeaders(parsed);
       }
-      if (url) {
-        setURLState((cur) => ({ ...cur, url }));
-      }
+      setURLState((cur) => {
+        const newCur = { ...cur };
+        if (urlJSON) {
+          newCur.urlJSON = urlJSON;
+        }
+        if (url) {
+          newCur.url = url;
+        }
+        return newCur;
+      });
     }
   }, [search]);
 
@@ -103,7 +140,14 @@ const SearchEdit = () => {
 
   return (
     <SearchCreateContainer>
-      <Button style={{ alignSelf: "start" }}>Save</Button>
+      <Button
+        style={{ alignSelf: "start" }}
+        onClick={() => {
+          editSearchEntry(searchState);
+        }}
+      >
+        Save
+      </Button>
       <TextInputStyled
         label="Search Name"
         value={searchState.name || ""}
@@ -114,16 +158,20 @@ const SearchEdit = () => {
         }}
       />
       <SearchControlsContainer>
-        <SearchControls search={searchState} editMode={true} />
-        <Button style={{ alignSelf: "end" }}>Add Field</Button>
+        <SearchControls
+          search={searchState}
+          editMode={true}
+          onEditField={(field: SearchEntryField) => {
+            setEditField(field);
+          }}
+        />
+        <SearchEditFieldModal
+          field={editField}
+          opened={Boolean(editField)}
+          onClose={() => setEditField(undefined)}
+        />
       </SearchControlsContainer>
-      <SearchEditURL
-        url={urlState.url}
-        editMode={urlState.editing}
-        onToggleEditMode={() =>
-          setURLState((cur) => ({ ...cur, editing: !cur.editing }))
-        }
-      />
+      <SearchEditURL onChange={onURLChange} urlJSON={urlState.urlJSON} />
       <SearchSelect
         label="API Return Type"
         data={[

@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import {
+  ActionIcon,
   Autocomplete,
   Button,
   Group,
@@ -13,8 +14,11 @@ import {
   SearchEntryType,
   ThemeEntryType,
 } from "../../types/LibraryTypes";
+import { IconEdit } from "@tabler/icons-react";
 
 const TextInputStyled = styled(TextInput)`
+  flex: 1;
+
   & .mantine-TextInput-input {
     color: white;
     background-color: transparent;
@@ -43,6 +47,8 @@ const SearchControlsStyled = styled.div`
 `;
 
 const SearchSelect = styled(Autocomplete)`
+  flex: 1;
+
   & .mantine-Input-input {
     color: white;
     background-color: #282c34;
@@ -75,12 +81,13 @@ const SearchControls = ({
   themes,
   theme,
   onSetTheme,
-  onFeildChange,
+  onFieldChange,
   query,
   onRunQuery,
   errorField,
   disabled,
   editMode,
+  onEditField,
 }: SearchControlsProps) => {
   return (
     <SearchControlsContainer editMode={editMode}>
@@ -91,40 +98,69 @@ const SearchControls = ({
             switch (type) {
               case "input":
                 return (
-                  <TextInputStyled
-                    disabled={disabled || editMode}
+                  <Group
                     key={name + "-input"}
-                    error={
-                      errorField && variables.includes(errorField)
-                        ? errorField
-                        : ""
-                    }
-                    label={name}
-                    value={query ? query[name] : ""}
-                    onChange={(evt) => {
-                      const value = evt.currentTarget?.value || "";
-                      onFeildChange?.(field, value);
-                    }}
-                  />
+                    style={{ alignItems: "end", gap: 0 }}
+                  >
+                    <TextInputStyled
+                      disabled={disabled || editMode}
+                      error={
+                        errorField && variables.includes(errorField)
+                          ? errorField
+                          : ""
+                      }
+                      label={name}
+                      value={query ? query[name] : ""}
+                      onChange={(evt) => {
+                        const value = evt.currentTarget?.value || "";
+                        onFieldChange?.(field, value);
+                      }}
+                    />
+                    {editMode && (
+                      <ActionIcon
+                        variant="transparent"
+                        onClick={() => {
+                          console.log(field);
+                          onEditField?.(field);
+                        }}
+                      >
+                        <IconEdit size={16} />
+                      </ActionIcon>
+                    )}
+                  </Group>
                 );
               case "select": {
                 return (
-                  <SearchSelect
-                    disabled={disabled || editMode}
-                    autoComplete="false"
-                    error={
-                      errorField && variables.includes(errorField)
-                        ? errorField
-                        : ""
-                    }
+                  <Group
                     key={name + "-select"}
-                    label={name}
-                    data={data || []}
-                    value={query ? query[name] : ""}
-                    onChange={(value) => {
-                      onFeildChange?.(field, value);
-                    }}
-                  />
+                    style={{ alignItems: "end", gap: 0 }}
+                  >
+                    <SearchSelect
+                      disabled={disabled || editMode}
+                      autoComplete="false"
+                      error={
+                        errorField && variables.includes(errorField)
+                          ? errorField
+                          : ""
+                      }
+                      label={name}
+                      data={data || []}
+                      value={query ? query[name] : ""}
+                      onChange={(value) => {
+                        onFieldChange?.(field, value);
+                      }}
+                    />
+                    {editMode && (
+                      <ActionIcon
+                        variant="transparent"
+                        onClick={() => {
+                          onEditField?.(field);
+                        }}
+                      >
+                        <IconEdit size={16} />
+                      </ActionIcon>
+                    )}
+                  </Group>
                 );
               }
             }
@@ -192,12 +228,13 @@ interface SearchControlsProps {
   theme?: ThemeEntryType;
   themes?: ThemeEntryType[];
   onSetTheme?: (theme: ThemeEntryType) => void;
-  onFeildChange?: (feild: SearchEntryField, value: string) => void;
+  onFieldChange?: (feild: SearchEntryField, value: string) => void;
   query?: Record<string, string>;
   onRunQuery?: () => void;
   errorField?: string | null;
   disabled?: boolean;
   editMode: boolean;
+  onEditField?: (field: SearchEntryField) => void;
 }
 
 interface SearchControlsContainerProps {

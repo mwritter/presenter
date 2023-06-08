@@ -34,6 +34,7 @@ const SearchContainer = styled.div`
 `;
 
 const SearchBarControls = styled.div`
+  display: flex;
   grid-area: actionmenu;
   background-color: #21212a;
   width: 100%;
@@ -85,7 +86,7 @@ const SearchView = ({ hidden }: { hidden: boolean }) => {
       });
   }, [query, latestRunQuery]);
 
-  const onFeildChange = useCallback(
+  const onFieldChange = useCallback(
     (field: SearchEntryField, value: string) => {
       let queryValues = [value];
       if (field.delimiters) {
@@ -130,7 +131,7 @@ const SearchView = ({ hidden }: { hidden: boolean }) => {
             themes={themes}
             theme={theme}
             onSetTheme={setTheme}
-            onFeildChange={onFeildChange}
+            onFieldChange={onFieldChange}
             onRunQuery={runQuery}
             errorField={errorField}
             disabled={isLoading}

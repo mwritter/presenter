@@ -28,30 +28,30 @@ const setWindowMonitors = async () => {
   const projectorMonitor = secondary;
   const promptMonitor = tertiary || primary;
   // TODO: uncomment this out
-  // const projectorWindow = new WebviewWindow("projector", {
-  //   url: "/projector",
-  //   title: "projector",
-  //   fullscreen: true,
-  // });
+  const projectorWindow = new WebviewWindow("projector", {
+    url: "/projector",
+    title: "projector",
+    fullscreen: true,
+  });
 
-  // const promptWindow = new WebviewWindow("prompt", {
-  //   url: "/prompt",
-  //   title: "prompt",
-  //   // fullscreen: true,
-  // });
+  const promptWindow = new WebviewWindow("prompt", {
+    url: "/prompt",
+    title: "prompt",
+    // fullscreen: true,
+  });
 
-  // projectorWindow.once("tauri://created", () => {
-  //   useStore
-  //     .getState()
-  //     .setProjector({ webview: projectorWindow, height: 1, width: 1 });
-  //   projectorWindow.setPosition(projectorMonitor.position);
-  //   projectorWindow.setFullscreen(true);
-  // });
+  projectorWindow.once("tauri://created", () => {
+    useStore
+      .getState()
+      .setProjector({ webview: projectorWindow, height: 1, width: 1 });
+    projectorWindow.setPosition(projectorMonitor.position);
+    projectorWindow.setFullscreen(true);
+  });
 
-  // promptWindow.once("tauri://created", () => {
-  //   useStore.getState().setPrompt(promptWindow);
-  //   promptWindow.setPosition(promptMonitor.position);
-  // });
+  promptWindow.once("tauri://created", () => {
+    useStore.getState().setPrompt(promptWindow);
+    promptWindow.setPosition(promptMonitor.position);
+  });
 };
 
 // TODO: when main view is closed or reloaded we need to close / reload
