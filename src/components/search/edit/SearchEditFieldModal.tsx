@@ -11,11 +11,12 @@ import {
   Title,
 } from "@mantine/core";
 import styled from "@emotion/styled";
-import { SearchEntryField } from "../../../types/LibraryTypes";
+import { SearchEntryField, SearchEntryType } from "../../../types/LibraryTypes";
 import useStore from "../../../store";
 import { useCallback, useEffect, useState } from "react";
 import { SearchValidator } from "../../../types/LibraryTypes";
 import { editSearchEntry } from "../../../helpers/search.helper";
+import SearchEditFieldVariableValidators from "./SearchEditFieldVariableValidators";
 
 const ModalContainer = styled(Modal)`
   .mantine-Modal-header {
@@ -101,10 +102,12 @@ const SearchEditFieldModal = ({
   const [_opened, { open, close }] = useDisclosure();
   const [state, setState] = useState<{
     field: SearchEntryField;
-    validator: SearchValidator;
+    validator: SearchEntryType["validator"];
+    currentValidator: string | null;
   }>({
     field: DEFAULT_VALUES,
     validator: {},
+    currentValidator: null,
   });
   const search = useStore(({ search }) => search);
 
@@ -112,6 +115,7 @@ const SearchEditFieldModal = ({
     setState({
       field: DEFAULT_VALUES,
       validator: {},
+      currentValidator: null,
     });
   }, []);
 
@@ -123,20 +127,32 @@ const SearchEditFieldModal = ({
     close();
   }, []);
 
+  const setValidator = useCallback(
+    (variable: string, validator: SearchValidator) => {
+      setState((cur) => ({
+        ...cur,
+        validator: { ...cur.validator, [variable]: validator },
+      }));
+    },
+    []
+  );
+
   useEffect(() => {
     if (field && search) {
-      const { validator } = search;
+      const { validator = {} } = search;
       // TODO: we'll need to search for the field.name and validator keys all in lowercase
       // also document thats how we find the validator
       setState((cur) => ({
         ...cur,
         field,
-        validator: validator[field.name] ?? {},
+        validator,
+        currentValidator: field.variables[0] || null,
       }));
     } else {
       setState({
         field: DEFAULT_VALUES,
         validator: {},
+        currentValidator: null,
       });
     }
   }, [search, field]);
@@ -175,13 +191,15 @@ const SearchEditFieldModal = ({
             value={state.field.variables.toString()}
             onChange={(evt) => {
               const variables = evt.target.value.split(",");
-              setState((cur) => ({
-                ...cur,
-                field: {
-                  ...cur.field,
-                  variables: variables.map((v) => v.trim()),
-                },
-              }));
+              setState((cur) => {
+                return {
+                  ...cur,
+                  field: {
+                    ...cur.field,
+                    variables: variables.map((v) => v.trim()),
+                  },
+                };
+              });
             }}
           />
           <TextInputStyled
@@ -221,84 +239,27 @@ const SearchEditFieldModal = ({
           />
           {/* Conditionaly show for each type: [Select, Input] */}
           {/* This is going to have to be its own component */}
-          {/* <Divider />
-          <Title order={3} weight="normal" color="white">
-            Validator
-          </Title>
-          <Group style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-            <Checkbox
-              label="Required"
-              checked={state.validator.required || false}
-              onChange={(evt) => {
-                setState((cur) => ({
-                  ...cur,
-                  validator: { ...cur.validator, required: evt.target.checked },
-                }));
-              }}
-              style={{ gridColumn: "1 / 3", justifySelf: "start" }}
-              styles={{
-                label: {
-                  color: "white",
-                },
-              }}
-            /> */}
-          {/* todo number input */}
-          {/* <TextInputStyled
-              label="Minimum Length"
-              description="Is there a minimum character length?"
-              value={state.validator.minLength}
-              onChange={(evt) =>
-                setState((cur) => ({
-                  ...cur,
-                  validator: { ...cur.validator, minLength: +evt.target.value },
-                }))
-              }
-            /> */}
-          {/* <TextInputStyled
-              label="Identifier"
-              description="How should this field contribute to the slides identifier?"
-              value={state.validator.identifier}
-              onChange={(evt) =>
-                setState((cur) => ({
-                  ...cur,
-                  validator: { ...cur.validator, identifier: evt.target.value },
-                }))
-              }
-            />
-            <TextInputStyled
-              label="Pattern Match"
-              description="Regex validation"
-              value={state.validator.pattern}
-              onChange={(evt) =>
-                setState((cur) => ({
-                  ...cur,
-                  validator: { ...cur.validator, pattern: evt.target.value },
-                }))
-              }
-            />
-            <TextInputStyled
-              label="Tag"
-              description="How should this field contribute to the slides tag?"
-              value={state.validator.tag}
-              onChange={(evt) =>
-                setState((cur) => ({
-                  ...cur,
-                  validator: { ...cur.validator, tag: evt.target.value },
-                }))
-              }
-            />
-            <TextInputStyled
-              label="Default Value"
-              description="If no input is give, we will use this default value"
-              value={state.validator.default}
-              onChange={(evt) =>
-                setState((cur) => ({
-                  ...cur,
-                  validator: { ...cur.validator, default: evt.target.value },
-                }))
-              }
-            /> */}
-          {/* </Group> */}
+          <Divider />
+          {state.field.variables.length ? (
+            <div>
+              <SelectStyled
+                label="Variable"
+                data={state.field.variables}
+                value={state.currentValidator}
+                onChange={(variable) => {
+                  if (!variable) return;
+                  setState((cur) => ({ ...cur, currentValidator: variable }));
+                }}
+              />
+              {state.currentValidator && (
+                <SearchEditFieldVariableValidators
+                  variable={state.currentValidator}
+                  validator={state.validator}
+                  setValidator={setValidator}
+                />
+              )}
+            </div>
+          ) : null}
           <Group>
             <Button
               style={{ justifySelf: "start" }}
@@ -323,13 +284,26 @@ const SearchEditFieldModal = ({
                       fields.push(state.field);
                     }
                   }
-                  editSearchEntry({ ...oldSearch, fields });
+                  editSearchEntry({
+                    ...oldSearch,
+                    fields,
+                    validator: state.validator,
+                  });
                 }
                 resetState();
                 _onClose();
               }}
             >
               Save
+            </Button>
+            <Button
+              color="red"
+              onClick={() => {
+                resetState();
+                _onClose();
+              }}
+            >
+              Cancel
             </Button>
             {field && (
               <Button
