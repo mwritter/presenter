@@ -147,6 +147,7 @@ export type SearchEntryType = {
 };
 
 export type SearchEntryField = {
+  id: string;
   name: string;
   type: string;
   variables: string[];
