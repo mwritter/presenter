@@ -3,8 +3,9 @@ import { Button, Stack, Text } from "@mantine/core";
 import { Editor, EditorContent, JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import variables from "../../../util/editor/plugin/variables";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import single from "../../../util/editor/plugin/single";
+import useStore from "../../../store";
 
 const StyledEditor = styled(EditorContent)`
   .ProseMirror {
@@ -52,13 +53,17 @@ const SearchURLEditor = ({
 }) => {
   const [editor, setEditor] = useState<Editor | null>(null);
   const [currentURL, setCurrentURL] = useState(urlJSON || "{}");
-  const VariablePlugin = variables([
-    "version",
-    "book",
-    "chapter",
-    "start",
-    "end",
-  ]);
+  const search = useStore(({ search }) => search);
+
+  if (!search) <></>;
+
+  const searchVariables = useMemo(() => {
+    const v: string[] = [];
+    search?.fields.forEach((field) => v.push(...field.variables));
+    return v;
+  }, []);
+
+  const VariablePlugin = variables(searchVariables);
 
   const onEditorBlur = useCallback((urlJSON: JSONContent) => {
     const saveableURL =

@@ -14,7 +14,7 @@ const VariableListContainer = styled.div`
 
 const VariableListItem = styled(Text)<TextProps & { onClick: () => void }>`
   cursor: pointer;
-  width: 250px;
+  min-width: 250px;
   padding: 0 0.5rem;
 
   &.is-selected {
@@ -44,7 +44,7 @@ export default forwardRef(
       setSelectedIndex((selectedIndex + 1) % props.items.length);
     };
 
-    const spaceHandler = () => {
+    const selectHandler = () => {
       selectItem(selectedIndex);
     };
 
@@ -62,8 +62,8 @@ export default forwardRef(
           return true;
         }
 
-        if (event.code === "Space") {
-          spaceHandler();
+        if (event.code === "Enter") {
+          selectHandler();
           return true;
         }
 

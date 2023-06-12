@@ -110,6 +110,10 @@ const SearchView = ({ hidden }: { hidden: boolean }) => {
   );
 
   useEffect(() => {
+    setQuery({});
+  }, [search]);
+
+  useEffect(() => {
     getSearchEntries();
     getThemeEnties();
   }, []);
