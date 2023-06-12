@@ -76,6 +76,20 @@ export const createNewSearchEntry = async (name: string) => {
   useStore.getState().setSearchEditMode(newSearch.name);
 };
 
+// Might need to add an ID to these enties to be safer
+export const deleteSearchEntry = async (name: string) => {
+  // get the search json and parse
+  const outlineString = await readTextFile("search/index.json", {
+    dir: BaseDirectory.AppData,
+  });
+  const searchOutline: SearchEntryType[] = JSON.parse(outlineString);
+
+  const newSearchOutline = searchOutline.filter(
+    (search) => search.name !== name
+  );
+  await write(newSearchOutline);
+};
+
 export const setSearchEntry = async (entry: SearchEntryType) => {
   const outlineString = await readTextFile("search/index.json", {
     dir: BaseDirectory.AppData,

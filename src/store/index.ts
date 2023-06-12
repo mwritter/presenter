@@ -39,7 +39,7 @@ interface Action {
   setLibrary: (library: LibraryEntryType) => void;
   setMedia: (media: MediaType) => void;
   setTheme: (theme: ThemeEntryType) => void;
-  setSearch: (search: SearchEntryType) => void;
+  setSearch: (search: SearchEntryType | null) => void;
   setSearchEntries: (entries: SearchEntryType[]) => void;
   setSearchEditMode: (searchName: string | null) => void;
   setMediaFiles: (files: FileEntry[]) => void;

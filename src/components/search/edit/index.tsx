@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Group,
+  Modal,
   Select,
   Text,
   TextInput,
@@ -17,6 +18,7 @@ import SearchEditHeaders from "./SearchEditHeaders";
 import SearchEditURL from "./SearchEditURL";
 import { editSearchEntry } from "../../../helpers/search.helper";
 import SearchEditFieldModal from "./SearchEditFieldModal";
+import SearchEntryDeleteModal from "./SearchEntryDeleteModal";
 
 const SearchCreateContainer = styled.div`
   grid-area: results;
@@ -140,14 +142,17 @@ const SearchEdit = () => {
 
   return (
     <SearchCreateContainer>
-      <Button
-        style={{ alignSelf: "start" }}
-        onClick={() => {
-          editSearchEntry(searchState);
-        }}
-      >
-        Save
-      </Button>
+      <Group>
+        <Button
+          style={{ alignSelf: "start" }}
+          onClick={() => {
+            editSearchEntry(searchState);
+          }}
+        >
+          Save
+        </Button>
+        <SearchEntryDeleteModal />
+      </Group>
       <TextInputStyled
         label="Search Name"
         value={searchState.name || ""}
